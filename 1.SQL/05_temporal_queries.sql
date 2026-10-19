@@ -8,9 +8,14 @@ FROM "order" o
 JOIN customer c ON o.customer_id = c.customer_id
 WHERE o.created_at >= CURRENT_TIMESTAMP - INTERVAL '2 hours';
 
--- Create a new real-time order with valid seed foreign keys
+-- Create a new real-time order with valid seed foreign keys and corresponding line item
+BEGIN;
 INSERT INTO "order" (customer_id, restaurant_id, driver_id, destination_id, status, delivery_fee, created_at, fulfilled_at)
 VALUES (3, 1, NULL, 3, 'PENDING', 0.00, CURRENT_TIMESTAMP, NULL);
+
+INSERT INTO order_item (order_id, item_id, restaurant_id, quantity, price_at_order)
+VALUES (currval(pg_get_serial_sequence('"order"', 'order_id'))::INT, 1, 1, 1, 120.00);
+COMMIT;
 
 -- Q5.1-2: Retrieve orders placed within the last 2 hours (Demonstrates newly inserted order)
 SELECT o.order_id, c.name AS customer_name, o.status, o.created_at

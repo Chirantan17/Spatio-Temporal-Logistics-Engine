@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Delivery - Student Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#090d16', cardbg: '#111827', bordercolor: '#1f2937' } } } }
+    </script>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- GLOBAL ROLE SWITCHER -->
+    <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+                <i class="fa-solid fa-mobile-screen text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
+                <p class="text-xs text-slate-400">Student Ordering Portal</p>
+            </div>
+        </div>
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
+            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
+            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
+            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
+            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
+            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+        </div>
+    </header>
+
+    <!-- CUSTOMER WORKSPACE -->
+    <main class="flex-1 p-8 max-w-6xl mx-auto w-full grid grid-cols-12 gap-8">
+        
+        <!-- RESTAURANT LIST -->
+        <div class="col-span-8 space-y-6">
+            <h2 class="text-xl font-bold border-b border-bordercolor pb-3">Available Dining Hubs</h2>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Main Canteen Card -->
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 hover:border-emerald-500/50 cursor-pointer transition" onclick="selectRestaurant('Main Canteen (Academic)')">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-emerald-400">Main Canteen</h3>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-1 rounded font-bold">24/7 OPEN</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> Academic Corridor</p>
+                    <div class="flex space-x-2">
+                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Meals</span>
+                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Biryani</span>
+                    </div>
+                </div>
+
+                <!-- SAC Canteen Card -->
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 hover:border-emerald-500/50 cursor-pointer transition" onclick="selectRestaurant('SAC Canteen')">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-emerald-400">SAC Canteen</h3>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-1 rounded font-bold">24/7 OPEN</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> Sports Complex Exterior</p>
+                    <div class="flex space-x-2">
+                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Healthy</span>
+                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Smoothies</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC MENU AREA -->
+            <div id="menu-section" class="hidden mt-8">
+                <h2 class="text-xl font-bold border-b border-bordercolor pb-3 mb-4" id="menu-title">Menu</h2>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-4 flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-200">Veg Thali</h4>
+                        <p class="text-xs text-slate-400">10 Min Prep Time</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="font-mono text-emerald-400 font-bold">₹120.00</span>
+                        <button onclick="addToCart('Veg Thali', 120)" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">Add +</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE CART & CHECKOUT -->
+        <div class="col-span-4">
+            <div class="bg-cardbg border border-bordercolor rounded-xl p-6 sticky top-24">
+                <h3 class="font-bold text-lg mb-4 flex items-center"><i class="fa-solid fa-basket-shopping mr-2 text-slate-400"></i> Your Cart</h3>
+                
+                <!-- Destination Selector -->
+                <div class="mb-6">
+                    <label class="text-xs font-bold text-slate-400 block mb-2">Drop-off Destination</label>
+                    <select id="dropoff" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+                        <option value="Hostel 1 Entrance Gate">Hostel 1 Entrance Gate</option>
+                        <option value="Hostel 3 Common Room">Hostel 3 Common Room</option>
+                        <option value="Auditorium Outer Drop">Auditorium Outer Drop</option>
+                        <option value="Flat C Security Desk">Flat C Security Desk</option>
+                    </select>
+                </div>
+
+                <div id="cart-items" class="space-y-3 mb-6 min-h-[100px]">
+                    <p class="text-xs text-slate-500 text-center mt-8">Cart is empty</p>
+                </div>
+
+                <div class="border-t border-slate-800 pt-4 mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-slate-400">Subtotal</span>
+                        <span class="font-mono font-bold text-white" id="subtotal">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-slate-400">Delivery Fee</span>
+                        <span class="font-mono font-bold text-white">₹15.00</span>
+                    </div>
+                    <div class="flex justify-between text-base mt-4 pt-4 border-t border-slate-800">
+                        <span class="font-bold text-white">Total</span>
+                        <span class="font-mono font-bold text-emerald-400" id="total">₹0.00</span>
+                    </div>
+                </div>
+
+                <button id="checkout-btn" onclick="placeOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-900/20" disabled>
+                    Place Order
+                </button>
+
+                <!-- Order Status Banner -->
+                <div id="status-banner" class="hidden mt-4 p-3 rounded-lg bg-sky-900/30 border border-sky-500/30 text-center">
+                    <p class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-1" id="order-state">Order Placed</p>
+                    <p class="text-[10px] text-slate-300">Awaiting restaurant confirmation...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const channel = new BroadcastChannel('campus_delivery');
+        let cartTotal = 0;
+        let activeRestaurant = '';
+
+        function selectRestaurant(name) {
+            activeRestaurant = name;
+            document.getElementById('menu-section').classList.remove('hidden');
+            document.getElementById('menu-title').innerText = `${name} - Menu`;
+        }
+
+        function addToCart(item, price) {
+            const cartItems = document.getElementById('cart-items');
+            if(cartTotal === 0) cartItems.innerHTML = ''; // Clear empty message
+            
+            cartTotal += price;
+            
+            cartItems.innerHTML += `
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-slate-200">1x ${item}</span>
+                    <span class="font-mono text-sm text-slate-400">₹${price.toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById('subtotal').innerText = `₹${cartTotal.toFixed(2)}`;
+            document.getElementById('total').innerText = `₹${(cartTotal + 15).toFixed(2)}`;
+            document.getElementById('checkout-btn').disabled = false;
+        }
+
+        function placeOrder() {
+            const dropoff = document.getElementById('dropoff').value;
+            
+            // Broadcast event to Restaurant Tab
+            channel.postMessage({
+                type: 'NEW_ORDER',
+                payload: {
+                    id: 'ORD-' + Math.floor(Math.random() * 10000),
+                    restaurant: activeRestaurant,
+                    customer: 'Rahul Sharma',
+                    destination: dropoff,
+                    total: (cartTotal + 15).toFixed(2)
+                }
+            });
+
+            // Update UI
+            document.getElementById('checkout-btn').classList.add('hidden');
+            document.getElementById('status-banner').classList.remove('hidden');
+        }
+
+        // Listen for Restaurant/Driver Updates
+        channel.onmessage = (event) => {
+            const data = event.data;
+            if (data.type === 'STATUS_UPDATE') {
+                const banner = document.getElementById('status-banner');
+                const stateText = document.getElementById('order-state');
+                
+                if (data.payload.status === 'PREPARING') {
+                    banner.className = 'mt-4 p-3 rounded-lg bg-orange-900/30 border border-orange-500/30 text-center';
+                    stateText.className = 'text-xs font-bold text-orange-400 uppercase tracking-wider mb-1';
+                    stateText.innerText = 'Food is Preparing';
+                    banner.querySelector('p:last-child').innerText = 'The kitchen is preparing your order.';
+                } 
+                else if (data.payload.status === 'IN_TRANSIT') {
+                    banner.className = 'mt-4 p-3 rounded-lg bg-purple-900/30 border border-purple-500/30 text-center';
+                    stateText.className = 'text-xs font-bold text-purple-400 uppercase tracking-wider mb-1';
+                    stateText.innerText = 'Out for Delivery';
+                    banner.querySelector('p:last-child').innerText = 'Driver is heading to ' + document.getElementById('dropoff').value;
+                }
+            }
+        };
+    </script>
+</body>
+</html>

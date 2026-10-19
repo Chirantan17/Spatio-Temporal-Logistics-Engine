@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Delivery - Driver Dispatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#090d16', cardbg: '#111827', bordercolor: '#1f2937' } } } }
+    </script>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- GLOBAL ROLE SWITCHER -->
+    <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-500/30">
+                <i class="fa-solid fa-motorcycle text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
+                <p class="text-xs text-slate-400">Driver Telemetry & Dispatch</p>
+            </div>
+        </div>
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
+            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
+            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
+            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
+            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
+            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+        </div>
+    </header>
+
+    <!-- DRIVER WORKSPACE -->
+    <main class="flex-1 p-8 max-w-6xl mx-auto w-full grid grid-cols-12 gap-8">
+        
+        <!-- DISPATCH RADAR (LEFT COLUMN) -->
+        <div class="col-span-7 space-y-6">
+            <div class="flex justify-between items-center border-b border-bordercolor pb-3">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fa-solid fa-satellite-dish text-indigo-400 mr-2 animate-pulse"></i> Dispatch Radar
+                </h2>
+                <span class="text-xs text-slate-400 font-mono">GiST KNN Index Active</span>
+            </div>
+            
+            <div id="dispatch-queue" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <!-- Orders appear here when Kitchen marks them PREPARING -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center" id="empty-radar">
+                    <div class="inline-block p-4 rounded-full bg-slate-800 mb-3">
+                        <i class="fa-solid fa-map-location-dot text-2xl text-slate-500"></i>
+                    </div>
+                    <p class="text-sm text-slate-400 font-bold">Scanning for nearby pickups...</p>
+                    <p class="text-xs text-slate-500 mt-1">Waiting for kitchens to begin preparation.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVE TRIP & TELEMETRY (RIGHT COLUMN) -->
+        <div class="col-span-5 space-y-6">
+            
+            <!-- DRIVER STATUS CARD -->
+            <div class="bg-cardbg border border-bordercolor rounded-xl p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full -z-0"></div>
+                <div class="relative z-10 flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-white">Driver: Vikram</h3>
+                        <p class="text-xs text-slate-400 font-mono">ID: DRV-004 | Zone: Academic</p>
+                    </div>
+                    <button id="status-toggle" onclick="toggleStatus()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded font-bold text-xs transition shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                        ONLINE
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 text-center border-t border-slate-800 pt-4">
+                    <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">Today's Trips</p>
+                        <p class="text-lg font-mono font-bold text-slate-200">14</p>
+                    </div>
+                    <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">Distance</p>
+                        <p class="text-lg font-mono font-bold text-slate-200">12.4 <span class="text-xs text-slate-500">km</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVE DELIVERY CARD -->
+            <div id="active-trip" class="bg-cardbg border border-indigo-500/50 rounded-xl p-6 shadow-[0_0_15px_rgba(99,102,241,0.1)] hidden">
+                <div class="flex justify-between items-start mb-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="bg-indigo-500/20 text-indigo-400 text-[10px] px-2 py-1 rounded font-bold mb-2 inline-block">ACTIVE DELIVERY</span>
+                        <h3 class="font-bold text-white text-lg" id="trip-order-id">ORD-1234</h3>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-400">ETA</p>
+                        <p class="font-mono text-emerald-400 font-bold">8 Mins</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6 relative">
+                    <!-- Vertical Line for Map visual -->
+                    <div class="absolute left-2.5 top-3 bottom-3 w-0.5 bg-slate-800"></div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-5 h-5 rounded-full bg-slate-800 border-2 border-orange-400 z-10 mr-3 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">Pickup Geofence</p>
+                            <p class="text-sm font-bold text-slate-200" id="trip-pickup">Main Canteen</p>
+                            <p class="text-[10px] text-slate-500 mt-1"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>ST_DWithin: Valid</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start pt-2">
+                        <div class="w-5 h-5 rounded-full bg-slate-800 border-2 border-sky-400 z-10 mr-3 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">Drop-off Point</p>
+                            <p class="text-sm font-bold text-sky-400" id="trip-dropoff">Hostel 1 Entrance Gate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="completeDelivery()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-indigo-900/20">
+                    <i class="fa-solid fa-flag-checkered mr-2"></i> Mark as Delivered
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const channel = new BroadcastChannel('campus_delivery');
+        let availableOrders = [];
+        let isOnline = true;
+        let activeOrderId = null;
+
+        function toggleStatus() {
+            const btn = document.getElementById('status-toggle');
+            isOnline = !isOnline;
+            if (isOnline) {
+                btn.className = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded font-bold text-xs transition shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+                btn.innerText = 'ONLINE';
+            } else {
+                btn.className = 'bg-rose-500/20 text-rose-400 border border-rose-500/50 px-3 py-1 rounded font-bold text-xs transition';
+                btn.innerText = 'OFFLINE';
+            }
+        }
+
+        // Listen for Kitchen broadcasting PREPARING status
+        channel.onmessage = (event) => {
+            const data = event.data;
+            
+            // Add to radar when Kitchen accepts order
+            if (data.type === 'STATUS_UPDATE' && data.payload.status === 'PREPARING') {
+                if (!availableOrders.find(o => o.id === data.payload.orderId)) {
+                    availableOrders.push({
+                        id: data.payload.orderId,
+                        restaurant: data.payload.restaurant,
+                        destination: data.payload.destination,
+                        distance: (Math.random() * 2 + 0.5).toFixed(1) // Mock distance 0.5 - 2.5km
+                    });
+                    renderRadar();
+                }
+            }
+        };
+
+        function acceptDelivery(orderId, restaurant, destination) {
+            if (!isOnline) {
+                alert("You must be ONLINE to accept deliveries.");
+                return;
+            }
+            if (activeOrderId) {
+                alert("You already have an active delivery.");
+                return;
+            }
+
+            activeOrderId = orderId;
+            
+            // Remove from local radar
+            availableOrders = availableOrders.filter(o => o.id !== orderId);
+            renderRadar();
+
+            // Populate Active Trip UI
+            document.getElementById('trip-order-id').innerText = orderId;
+            document.getElementById('trip-pickup').innerText = restaurant;
+            document.getElementById('trip-dropoff').innerText = destination;
+            document.getElementById('active-trip').classList.remove('hidden');
+
+            // Broadcast to Student & Kitchen that driver is IN_TRANSIT
+            channel.postMessage({
+                type: 'STATUS_UPDATE',
+                payload: { orderId: orderId, status: 'IN_TRANSIT' }
+            });
+        }
+
+        function completeDelivery() {
+            // Broadcast completion to Student
+            channel.postMessage({
+                type: 'STATUS_UPDATE',
+                payload: { orderId: activeOrderId, status: 'DELIVERED' }
+            });
+
+            activeOrderId = null;
+            document.getElementById('active-trip').classList.add('hidden');
+        }
+
+        function renderRadar() {
+            const queue = document.getElementById('dispatch-queue');
+            const emptyRadar = document.getElementById('empty-radar');
+
+            if (availableOrders.length === 0) {
+                emptyRadar.classList.remove('hidden');
+                queue.innerHTML = '';
+                queue.appendChild(emptyRadar);
+            } else {
+                emptyRadar.classList.add('hidden');
+                queue.innerHTML = availableOrders.map(order => `
+                    <div class="bg-cardbg border border-indigo-500/30 rounded-xl p-4 flex justify-between items-center hover:bg-slate-800/50 transition">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-bold border border-slate-700">${order.distance} km away</span>
+                                <h4 class="font-bold text-slate-200">${order.id}</h4>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold"><i class="fa-solid fa-arrow-right text-slate-600 mx-1"></i> Pickup: <span class="text-orange-400">${order.restaurant}</span></p>
+                            <p class="text-xs text-slate-400 font-bold"><i class="fa-solid fa-arrow-right text-slate-600 mx-1"></i> Drop: <span class="text-sky-400">${order.destination}</span></p>
+                        </div>
+                        <button onclick="acceptDelivery('${order.id}', '${order.restaurant}', '${order.destination}')" class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/50 px-4 py-3 rounded-lg text-xs font-bold transition">
+                            Accept Route
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>

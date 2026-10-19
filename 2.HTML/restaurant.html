@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Delivery - Kitchen Hub (KOT)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#090d16', cardbg: '#111827', bordercolor: '#1f2937' } } } }
+    </script>
+</head>
+<body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- GLOBAL ROLE SWITCHER -->
+    <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-orange-500/20 text-orange-400 rounded-lg border border-orange-500/30">
+                <i class="fa-solid fa-fire-burner text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
+                <p class="text-xs text-slate-400">Kitchen Operations Terminal (KOT)</p>
+            </div>
+        </div>
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
+            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
+            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-orange-600 text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
+            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
+            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
+            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+        </div>
+    </header>
+
+    <!-- KITCHEN WORKSPACE -->
+    <main class="flex-1 flex flex-col">
+        
+        <!-- RESTAURANT SUB-TABS -->
+        <div class="bg-cardbg border-b border-bordercolor px-8 py-4 flex space-x-2 overflow-x-auto">
+            <button onclick="switchRestaurant('Main Canteen (Academic Canteen)')" id="tab-Main Canteen (Academic Canteen)" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition">Main Canteen</button>
+            <button onclick="switchRestaurant('SAC Canteen')" id="tab-SAC Canteen" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">SAC Canteen</button>
+            <button onclick="switchRestaurant('Yummpys')" id="tab-Yummpys" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Yummpys</button>
+            <button onclick="switchRestaurant('Central Library Cafe')" id="tab-Central Library Cafe" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Library Cafe</button>
+            <button onclick="switchRestaurant('Hostel Circle Late-Night Hub')" id="tab-Hostel Circle Late-Night Hub" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Hostel Night Hub</button>
+        </div>
+
+        <!-- ORDER BOARDS -->
+        <div class="flex-1 p-8 grid grid-cols-2 gap-8">
+            
+            <!-- INCOMING PENDING QUEUE -->
+            <div class="flex flex-col space-y-4">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-2">
+                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-bell text-rose-400 mr-2"></i> Incoming Orders (PENDING)</h2>
+                    <span id="pending-count" class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded font-bold text-xs">0</span>
+                </div>
+                <div id="pending-queue" class="space-y-4 overflow-y-auto max-h-[600px] pr-2">
+                    <p class="text-xs text-slate-500 text-center mt-10 italic">No incoming orders for this kitchen.</p>
+                </div>
+            </div>
+
+            <!-- ACTIVE PREPARING QUEUE -->
+            <div class="flex flex-col space-y-4">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-2">
+                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-fire text-orange-400 mr-2"></i> Active Kitchen (PREPARING)</h2>
+                    <span id="preparing-count" class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded font-bold text-xs">0</span>
+                </div>
+                <div id="preparing-queue" class="space-y-4 overflow-y-auto max-h-[600px] pr-2">
+                    <p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently preparing.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const channel = new BroadcastChannel('campus_delivery');
+        
+        // Multi-tenant isolation: Store orders by restaurant name
+        let restaurantOrders = {
+            'Main Canteen (Academic Canteen)': [],
+            'SAC Canteen': [],
+            'Yummpys': [],
+            'Central Library Cafe': [],
+            'Hostel Circle Late-Night Hub': []
+        };
+        
+        let activeRestaurant = 'Main Canteen (Academic Canteen)';
+
+        function switchRestaurant(name) {
+            activeRestaurant = name;
+            
+            // UI Tab Switching logic
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition';
+            });
+            const activeBtn = document.getElementById('tab-' + name);
+            if(activeBtn) {
+                activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition';
+            }
+            
+            renderOrders();
+        }
+
+        // Listen for incoming orders from the Student Portal
+        channel.onmessage = (event) => {
+            const data = event.data;
+            if (data.type === 'NEW_ORDER') {
+                // Route to the correct restaurant's isolated queue
+                if (restaurantOrders[data.payload.restaurant]) {
+                    restaurantOrders[data.payload.restaurant].push({
+                        ...data.payload,
+                        status: 'PENDING',
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+                    
+                    // Only re-render if we are currently viewing the restaurant that got the order
+                    if(activeRestaurant === data.payload.restaurant) {
+                        renderOrders();
+                    }
+                }
+            }
+            // If Driver picks it up, remove from Kitchen board
+            if (data.type === 'STATUS_UPDATE' && data.payload.status === 'IN_TRANSIT') {
+                 const orders = restaurantOrders[activeRestaurant];
+                 const index = orders.findIndex(o => o.id === data.payload.orderId);
+                 if(index > -1) {
+                     orders.splice(index, 1);
+                     renderOrders();
+                 }
+            }
+        };
+
+        function acceptOrder(orderId) {
+            const order = restaurantOrders[activeRestaurant].find(o => o.id === orderId);
+            if(order) {
+                order.status = 'PREPARING';
+                renderOrders();
+                
+                // Broadcast to Customer (Food is cooking) & Driver (Dispatch available)
+                channel.postMessage({
+                    type: 'STATUS_UPDATE',
+                    payload: { orderId: orderId, status: 'PREPARING', restaurant: activeRestaurant, destination: order.destination }
+                });
+            }
+        }
+
+        function rejectOrder(orderId) {
+            const orders = restaurantOrders[activeRestaurant];
+            const index = orders.findIndex(o => o.id === orderId);
+            
+            if(index > -1) {
+                // Broadcast rejection to Customer
+                channel.postMessage({
+                    type: 'STATUS_UPDATE',
+                    payload: { orderId: orderId, status: 'CANCELLED', reason: 'Kitchen Capacity/Item Unavailable' }
+                });
+                // Remove from KOT
+                orders.splice(index, 1);
+                renderOrders();
+            }
+        }
+
+        function renderOrders() {
+            const pendingQueue = document.getElementById('pending-queue');
+            const preparingQueue = document.getElementById('preparing-queue');
+            
+            const orders = restaurantOrders[activeRestaurant];
+            const pendingOrders = orders.filter(o => o.status === 'PENDING');
+            const preparingOrders = orders.filter(o => o.status === 'PREPARING');
+
+            document.getElementById('pending-count').innerText = pendingOrders.length;
+            document.getElementById('preparing-count').innerText = preparingOrders.length;
+
+            // Render PENDING
+            if (pendingOrders.length === 0) {
+                pendingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No incoming orders.</p>`;
+            } else {
+                pendingQueue.innerHTML = pendingOrders.map(order => `
+                    <div class="bg-cardbg border border-rose-500/30 rounded-xl p-4 shadow-lg">
+                        <div class="flex justify-between items-start mb-3 border-b border-slate-800 pb-2">
+                            <div>
+                                <h3 class="font-bold text-white">${order.id}</h3>
+                                <p class="text-xs text-slate-400">Customer: ${order.customer}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-mono text-emerald-400 font-bold block">₹${order.total}</span>
+                                <span class="text-[10px] text-slate-500">${order.timestamp}</span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <!-- Dynamic Cart Items mapped from payload -->
+                            <p class="text-sm text-slate-300"><i class="fa-solid fa-utensils text-slate-500 mr-2"></i> ${order.itemsDescription || '1x Customer Cart Selection'}</p>
+                            ${order.isSurge ? '<span class="inline-block mt-2 bg-purple-500/20 text-purple-400 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30">LATE-NIGHT SURGE APPLIED</span>' : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="acceptOrder('${order.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded transition"><i class="fa-solid fa-check mr-1"></i> Accept</button>
+                            <button onclick="rejectOrder('${order.id}')" class="bg-rose-900/50 hover:bg-rose-600 border border-rose-500/30 text-rose-200 hover:text-white text-xs font-bold px-4 py-2 rounded transition"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render PREPARING
+            if (preparingOrders.length === 0) {
+                preparingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently preparing.</p>`;
+            } else {
+                preparingQueue.innerHTML = preparingOrders.map(order => `
+                    <div class="bg-slate-900 border border-orange-500/30 rounded-xl p-4 shadow-lg border-l-4 border-l-orange-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-bold text-white">${order.id}</h3>
+                                <p class="text-xs text-slate-400">Drop-off: <span class="text-sky-400 font-bold">${order.destination}</span></p>
+                            </div>
+                            <span class="bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded font-bold animate-pulse">COOKING</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-2"><i class="fa-solid fa-radar mr-1"></i> Broadcasting to available drivers for pickup...</p>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
