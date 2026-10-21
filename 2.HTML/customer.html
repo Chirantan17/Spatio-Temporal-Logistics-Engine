@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Delivery - Student Portal</title>
+    <title>Campus Eats - Student & Campus Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,7 +12,7 @@
 </head>
 <body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- GLOBAL ROLE SWITCHER -->
+    <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">
@@ -20,113 +20,162 @@
             </div>
             <div>
                 <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
-                <p class="text-xs text-slate-400">Student Ordering Portal</p>
+                <p class="text-xs text-slate-400">BITS Hyderabad Ordering Portal</p>
             </div>
         </div>
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
-            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
-            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
-            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
-            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
-            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+
+        <div id="telemetry-warning-badge" class="hidden text-xs font-mono px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full font-bold flex items-center animate-pulse">
+            <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Driver Telemetry Paused (Indoor / Basement)
         </div>
     </header>
 
     <!-- CUSTOMER WORKSPACE -->
-    <main class="flex-1 p-8 max-w-6xl mx-auto w-full grid grid-cols-12 gap-8">
+    <main class="flex-1 p-8 max-w-7xl mx-auto w-full grid grid-cols-12 gap-8">
         
-        <!-- RESTAURANT LIST -->
+        <!-- RESTAURANTS & MENU COLUMN -->
         <div class="col-span-8 space-y-6">
-            <h2 class="text-xl font-bold border-b border-bordercolor pb-3">Available Dining Hubs</h2>
             
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Main Canteen Card -->
-                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 hover:border-emerald-500/50 cursor-pointer transition" onclick="selectRestaurant('Main Canteen (Academic)')">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg text-emerald-400">Main Canteen</h3>
-                        <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-1 rounded font-bold">24/7 OPEN</span>
+            <!-- IDENTITY PROFILE SELECTOR -->
+            <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-id-badge text-emerald-400 mr-2"></i> Verified Campus Identity (Schema 3NF)
+                    </h3>
+                    <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">Multi-Tenant Session Isolated</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Campus Role</label>
+                        <select id="user-role" onchange="switchUserRole()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                            <option value="STUDENT">Student</option>
+                            <option value="FACULTY">Faculty (Teaching)</option>
+                            <option value="STAFF">Staff (Non-Teaching)</option>
+                            <option value="DIRECTOR">Director (Executive)</option>
+                        </select>
                     </div>
-                    <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> Academic Corridor</p>
-                    <div class="flex space-x-2">
-                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Meals</span>
-                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Biryani</span>
+                    <div id="gender-field">
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Gender (Hostel Routing)</label>
+                        <select id="user-gender" onchange="updateDropOffLocations()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                            <option value="MALE">Male (Sector A)</option>
+                            <option value="FEMALE">Female (Sector B)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Customer Profile</label>
+                        <input type="text" id="cust-name" value="Rahul Sharma" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 font-mono" readonly>
                     </div>
                 </div>
+            </div>
 
-                <!-- SAC Canteen Card -->
-                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 hover:border-emerald-500/50 cursor-pointer transition" onclick="selectRestaurant('SAC Canteen')">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-lg text-emerald-400">SAC Canteen</h3>
-                        <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-1 rounded font-bold">24/7 OPEN</span>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-location-dot mr-1"></i> Sports Complex Exterior</p>
-                    <div class="flex space-x-2">
-                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Healthy</span>
-                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">Smoothies</span>
+            <!-- KITCHEN SURGE ALERT BANNER -->
+            <div id="outlet-surge-alert" class="hidden bg-orange-950/40 border border-orange-500/50 rounded-xl p-3.5 flex items-center justify-between text-xs text-orange-300">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-solid fa-clock-rotate-left text-orange-400 text-base"></i>
+                    <div>
+                        <p class="font-bold text-orange-200">High Kitchen Congestion at <span id="surge-outlet-name">Outlet</span></p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Kitchen reports line bottlenecks. Extended prep time buffer (+15m) active.</p>
                     </div>
                 </div>
+                <span class="bg-orange-500/20 text-orange-400 border border-orange-500/40 font-mono text-[10px] font-bold px-2 py-1 rounded">+15m Delay</span>
+            </div>
+
+            <!-- DINING HUBS GRID -->
+            <div>
+                <h2 class="text-lg font-bold border-b border-bordercolor pb-3 mb-4">Campus Dining Facilities (5 Outlets)</h2>
+                <div class="grid grid-cols-3 gap-3" id="canteen-cards"></div>
             </div>
 
             <!-- DYNAMIC MENU AREA -->
-            <div id="menu-section" class="hidden mt-8">
-                <h2 class="text-xl font-bold border-b border-bordercolor pb-3 mb-4" id="menu-title">Menu</h2>
-                <div class="bg-cardbg border border-bordercolor rounded-xl p-4 flex justify-between items-center">
+            <div id="menu-section" class="hidden">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-3 mb-4">
                     <div>
-                        <h4 class="font-bold text-slate-200">Veg Thali</h4>
-                        <p class="text-xs text-slate-400">10 Min Prep Time</p>
+                        <h2 class="text-lg font-bold text-white" id="menu-title">Select an Outlet</h2>
+                        <p class="text-xs text-slate-400" id="menu-subtitle">Full catalog loaded</p>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="font-mono text-emerald-400 font-bold">₹120.00</span>
-                        <button onclick="addToCart('Veg Thali', 120)" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">Add +</button>
-                    </div>
+                    <span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">24/7 Service Window</span>
                 </div>
+                <div id="menu-items-grid" class="grid grid-cols-2 gap-3"></div>
             </div>
         </div>
 
-        <!-- LIVE CART & CHECKOUT -->
+        <!-- CART & CHECKOUT COLUMN -->
         <div class="col-span-4">
-            <div class="bg-cardbg border border-bordercolor rounded-xl p-6 sticky top-24">
-                <h3 class="font-bold text-lg mb-4 flex items-center"><i class="fa-solid fa-basket-shopping mr-2 text-slate-400"></i> Your Cart</h3>
+            <div class="bg-cardbg border border-bordercolor rounded-xl p-6 sticky top-24 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-basket-shopping mr-2 text-slate-400"></i> Active Cart</h3>
+                    <span id="session-tag" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">STUDENT</span>
+                </div>
                 
-                <!-- Destination Selector -->
-                <div class="mb-6">
-                    <label class="text-xs font-bold text-slate-400 block mb-2">Drop-off Destination</label>
-                    <select id="dropoff" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
-                        <option value="Hostel 1 Entrance Gate">Hostel 1 Entrance Gate</option>
-                        <option value="Hostel 3 Common Room">Hostel 3 Common Room</option>
-                        <option value="Auditorium Outer Drop">Auditorium Outer Drop</option>
-                        <option value="Flat C Security Desk">Flat C Security Desk</option>
+                <div class="mb-5">
+                    <label class="text-xs font-bold text-slate-400 block mb-2">Permitted Drop-Off Gate</label>
+                    <select id="dropoff" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-medium">
                     </select>
+                    <p class="text-[10px] text-slate-500 mt-1"><i class="fa-solid fa-location-crosshairs mr-1"></i>Drivers restricted to external gate only</p>
                 </div>
 
-                <div id="cart-items" class="space-y-3 mb-6 min-h-[100px]">
-                    <p class="text-xs text-slate-500 text-center mt-8">Cart is empty</p>
+                <div id="cart-items" class="space-y-3 mb-6 min-h-[120px] max-h-[240px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-500 text-center mt-12 italic">Cart is empty</p>
                 </div>
 
-                <div class="border-t border-slate-800 pt-4 mb-6">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="text-slate-400">Subtotal</span>
+                <div class="border-t border-slate-800 pt-4 mb-6 text-xs space-y-2">
+                    <div class="flex justify-between text-slate-400">
+                        <span>Items Subtotal</span>
                         <span class="font-mono font-bold text-white" id="subtotal">₹0.00</span>
                     </div>
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="text-slate-400">Delivery Fee</span>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Delivery Fee</span>
                         <span class="font-mono font-bold text-white">₹15.00</span>
                     </div>
-                    <div class="flex justify-between text-base mt-4 pt-4 border-t border-slate-800">
-                        <span class="font-bold text-white">Total</span>
-                        <span class="font-mono font-bold text-emerald-400" id="total">₹0.00</span>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Physical Items (Bag Load)</span>
+                        <span class="font-mono font-bold text-indigo-400" id="total-bag-items">0 / 5 units</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Required Cooking Units</span>
+                        <span class="font-mono font-bold text-amber-400" id="total-stove-units">0 slots</span>
+                    </div>
+                    <div class="flex justify-between text-base pt-3 border-t border-slate-800 font-bold">
+                        <span class="text-white">Total Paid</span>
+                        <span class="font-mono text-emerald-400" id="total">₹0.00</span>
                     </div>
                 </div>
 
-                <button id="checkout-btn" onclick="placeOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-900/20" disabled>
-                    Place Order
+                <button id="checkout-btn" onclick="placeOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-900/20 text-sm" disabled>
+                    Place ACID Order
                 </button>
 
                 <!-- Order Status Banner -->
-                <div id="status-banner" class="hidden mt-4 p-3 rounded-lg bg-sky-900/30 border border-sky-500/30 text-center">
-                    <p class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-1" id="order-state">Order Placed</p>
-                    <p class="text-[10px] text-slate-300">Awaiting restaurant confirmation...</p>
+                <div id="status-banner" class="hidden mt-4 p-3.5 rounded-xl border text-center transition-all duration-300">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-1" id="order-state">Order Placed</p>
+                    <p class="text-[11px] text-slate-300" id="order-subtext">Broadcasting over BroadcastChannel to KOT...</p>
+                    
+                    <div id="fleet-attribution-pill" class="hidden mt-2 p-1.5 rounded bg-slate-950/80 border border-slate-800 text-[10px] font-mono text-indigo-300 flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-motorcycle text-indigo-400"></i>
+                        <span id="fleet-attribution-text">Local Staged Unit Dispatched</span>
+                    </div>
                 </div>
+
+                <!-- ALL DRIVERS DECLINED ACTION MODAL -->
+                <div id="pickup-fallback-modal" class="hidden mt-4 p-4 rounded-xl border border-yellow-500/60 bg-yellow-950/40 text-left space-y-3">
+                    <div class="flex items-center space-x-2 text-yellow-400">
+                        <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                        <span class="text-xs font-bold uppercase tracking-wide">No Delivery Agent Available</span>
+                    </div>
+                    <p class="text-xs text-slate-300">All campus fleet units declined, are offline, or have full thermal bags (5/5 items). Your meal is hot at the kitchen counter.</p>
+                    
+                    <div class="space-y-2 pt-2">
+                        <button onclick="handleCustomerChoice('PICKUP')" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-person-walking mr-1.5"></i> Available for Self-Pickup
+                        </button>
+                        <p class="text-[10px] text-yellow-300 italic text-center">Collect your ₹15 delivery fee CASH REFUND at the counter.</p>
+
+                        <button onclick="handleCustomerChoice('CANCEL')" class="w-full bg-slate-900 hover:bg-rose-950 border border-slate-700 text-rose-300 font-bold py-2 rounded-lg text-xs transition mt-2">
+                            <i class="fa-solid fa-xmark mr-1.5"></i> Not Available for Pickup (Cancel Order)
+                        </button>
+                        <p class="text-[10px] text-rose-400 italic text-center">₹15 delivery fee refunded; food cost retained by kitchen.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -134,74 +183,458 @@
 
     <script>
         const channel = new BroadcastChannel('campus_delivery');
-        let cartTotal = 0;
-        let activeRestaurant = '';
+        let activeRestaurant = 'Main Canteen (Academic Canteen)';
+        let currentRole = 'STUDENT';
+        let surgeOutlets = new Set();
 
-        function selectRestaurant(name) {
-            activeRestaurant = name;
-            document.getElementById('menu-section').classList.remove('hidden');
-            document.getElementById('menu-title').innerText = `${name} - Menu`;
+        const userSessions = {
+            'STUDENT': { name: 'Rahul Sharma', cart: [], activeOrderId: null, activeDriverId: null, statusState: null, statusSubtext: null, bannerClass: null, attributionText: null, attributionClass: null, showFallback: false },
+            'FACULTY': { name: 'Prof. K. Rao',  cart: [], activeOrderId: null, activeDriverId: null, statusState: null, statusSubtext: null, bannerClass: null, attributionText: null, attributionClass: null, showFallback: false },
+            'STAFF':   { name: 'Amit Verma',   cart: [], activeOrderId: null, activeDriverId: null, statusState: null, statusSubtext: null, bannerClass: null, attributionText: null, attributionClass: null, showFallback: false },
+            'DIRECTOR':{ name: 'Dr. M. Swamy', cart: [], activeOrderId: null, activeDriverId: null, statusState: null, statusSubtext: null, bannerClass: null, attributionText: null, attributionClass: null, showFallback: false }
+        };
+
+        const diningHubs = {
+            'Main Canteen (Academic Canteen)': {
+                zone: 'Academic Corridor',
+                tags: ['Meals', 'Dine-In'],
+                menu: [
+                    { name: 'Veg Thali', category: 'General', price: 120.00, prep: '10 Mins', stoveUnits: 2 },
+                    { name: 'Chicken Biryani', category: 'General', price: 180.00, prep: '15 Mins', stoveUnits: 2 },
+                    { name: 'Masala Dosa', category: 'Breakfast', price: 80.00, prep: '12 Mins', stoveUnits: 2 },
+                    { name: 'Samosa Chat', category: 'Snack', price: 60.00, prep: '5 Mins', stoveUnits: 1 },
+                    { name: 'Veg Cheese Burger', category: 'Fast Food', price: 90.00, prep: '8 Mins', stoveUnits: 2 },
+                    { name: 'Double Egg Roll', category: 'Snack', price: 60.00, prep: '8 Mins', stoveUnits: 1 }
+                ]
+            },
+            'SAC Canteen': {
+                zone: 'Sports Complex',
+                tags: ['Fitness', 'Protein'],
+                menu: [
+                    { name: 'High-Protein Smoothie', category: 'Healthy', price: 110.00, prep: '5 Mins', stoveUnits: 0 },
+                    { name: 'Grilled Chicken Salad', category: 'Healthy', price: 140.00, prep: '10 Mins', stoveUnits: 1 },
+                    { name: 'Fresh Orange Juice', category: 'Beverage', price: 60.00, prep: '5 Mins', stoveUnits: 0 },
+                    { name: 'Seasonal Fruit Bowl', category: 'Healthy', price: 80.00, prep: '5 Mins', stoveUnits: 0 },
+                    { name: 'Energy Protein Bar', category: 'Quick Snack', price: 40.00, prep: '1 Min', stoveUnits: 0 },
+                    { name: 'Boiled Egg Platter', category: 'Healthy', price: 50.00, prep: '5 Mins', stoveUnits: 1 }
+                ]
+            },
+            'Yummpys': {
+                zone: 'Fast Food Strip',
+                tags: ['Rolls', 'Burgers'],
+                menu: [
+                    { name: 'Chicken Tikka Roll', category: 'Rolls', price: 90.00, prep: '8 Mins', stoveUnits: 1 },
+                    { name: 'Veg Cheese Burger', category: 'Burgers', price: 80.00, prep: '8 Mins', stoveUnits: 2 },
+                    { name: 'Butter Chicken Naan', category: 'Main Course', price: 190.00, prep: '15 Mins', stoveUnits: 2 },
+                    { name: 'Paneer Butter Masala', category: 'Main Course', price: 160.00, prep: '12 Mins', stoveUnits: 2 },
+                    { name: 'Peri Peri French Fries', category: 'Snack', price: 75.00, prep: '6 Mins', stoveUnits: 1 },
+                    { name: 'Gulab Jamun (2 pcs)', category: 'Dessert', price: 45.00, prep: '2 Mins', stoveUnits: 0 }
+                ]
+            },
+            'Central Library Cafe': {
+                zone: 'Academic Quiet Zone',
+                tags: ['Cafe', 'Brews'],
+                menu: [
+                    { name: 'Cold Coffee', category: 'Beverage', price: 70.00, prep: '5 Mins', stoveUnits: 0 },
+                    { name: 'Espresso Coffee', category: 'Hot Brew', price: 60.00, prep: '3 Mins', stoveUnits: 0 },
+                    { name: 'Club Sandwich', category: 'Bakery', price: 110.00, prep: '7 Mins', stoveUnits: 1 },
+                    { name: 'Chocolate Muffin', category: 'Bakery', price: 65.00, prep: '2 Mins', stoveUnits: 0 },
+                    { name: 'Iced Lemon Tea', category: 'Beverage', price: 50.00, prep: '3 Mins', stoveUnits: 0 },
+                    { name: 'Butter Croissant', category: 'Bakery', price: 85.00, prep: '4 Mins', stoveUnits: 0 }
+                ]
+            },
+            'Hostel Circle Late-Night Hub': {
+                zone: 'Hostel Pathway',
+                tags: ['24/7', 'Snacks'],
+                menu: [
+                    { name: 'Midnight Maggi Bowl', category: 'Late Night', price: 50.00, prep: '5 Mins', stoveUnits: 1 },
+                    { name: 'Double Egg Roll', category: 'Snack', price: 60.00, prep: '8 Mins', stoveUnits: 1 },
+                    { name: 'Mini Tiffin Combo', category: 'South Indian', price: 100.00, prep: '8 Mins', stoveUnits: 2 },
+                    { name: 'Filter Coffee', category: 'Hot Brew', price: 35.00, prep: '3 Mins', stoveUnits: 0 },
+                    { name: 'Cheese Bun Maska', category: 'Quick Bite', price: 55.00, prep: '4 Mins', stoveUnits: 0 },
+                    { name: 'Badam Milk', category: 'Beverage', price: 50.00, prep: '3 Mins', stoveUnits: 0 }
+                ]
+            }
+        };
+
+        function switchUserRole() {
+            currentRole = document.getElementById('user-role').value;
+            const session = userSessions[currentRole];
+
+            document.getElementById('session-tag').innerText = currentRole;
+            document.getElementById('cust-name').value = session.name;
+
+            updateDropOffLocations();
+            renderActiveCartUI();
+            restoreSessionStatusUI();
         }
 
-        function addToCart(item, price) {
-            const cartItems = document.getElementById('cart-items');
-            if(cartTotal === 0) cartItems.innerHTML = ''; // Clear empty message
-            
-            cartTotal += price;
-            
-            cartItems.innerHTML += `
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-slate-200">1x ${item}</span>
-                    <span class="font-mono text-sm text-slate-400">₹${price.toFixed(2)}</span>
-                </div>
-            `;
-            
-            document.getElementById('subtotal').innerText = `₹${cartTotal.toFixed(2)}`;
-            document.getElementById('total').innerText = `₹${(cartTotal + 15).toFixed(2)}`;
-            document.getElementById('checkout-btn').disabled = false;
+        function updateDropOffLocations() {
+            const gender = document.getElementById('user-gender').value;
+            const dropSelect = document.getElementById('dropoff');
+            const genderField = document.getElementById('gender-field');
+
+            let options = [];
+
+            if (currentRole === 'STUDENT') {
+                genderField.style.display = 'block';
+                userSessions['STUDENT'].name = (gender === 'MALE') ? 'Rahul Sharma' : 'Priya Patel';
+                document.getElementById('cust-name').value = userSessions['STUDENT'].name;
+                options = (gender === 'MALE') 
+                    ? ['Hostel 1 Entrance Gate', 'Auditorium Outer Drop', 'Library Exterior Drop', 'Cricket Stadium Outer Gate']
+                    : ['Hostel 3 Common Room', 'Auditorium Outer Drop', 'Library Exterior Drop', 'Tennis Court Gate'];
+            } 
+            else if (currentRole === 'FACULTY') {
+                genderField.style.display = 'none';
+                options = ['Flat C Security Desk', 'Library Exterior Drop', 'Auditorium Outer Drop'];
+            }
+            else if (currentRole === 'DIRECTOR') {
+                genderField.style.display = 'none';
+                options = ['Director Security Gate'];
+            }
+            else if (currentRole === 'STAFF') {
+                genderField.style.display = 'none';
+                options = ['Auditorium Outer Drop', 'Library Exterior Drop', 'Cricket Stadium Outer Gate'];
+            }
+
+            dropSelect.innerHTML = options.map(o => `<option value="${o}">${o}</option>`).join('');
+        }
+
+        function addToCart(itemName, price, stoveUnits) {
+            const session = userSessions[currentRole];
+            if (session.activeOrderId) {
+                alert('You already have an active order in progress. Wait for delivery or cancel.');
+                return;
+            }
+
+            const existing = session.cart.find(i => i.name === itemName);
+            if (existing) {
+                existing.qty++;
+            } else {
+                session.cart.push({ name: itemName, price: price, stoveUnits: stoveUnits, qty: 1 });
+            }
+
+            renderActiveCartUI();
+        }
+
+        function renderActiveCartUI() {
+            const session = userSessions[currentRole];
+            const cartItemsEl = document.getElementById('cart-items');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            if (session.cart.length === 0) {
+                cartItemsEl.innerHTML = '<p class="text-xs text-slate-500 text-center mt-12 italic">Cart is empty</p>';
+                document.getElementById('subtotal').innerText = '₹0.00';
+                document.getElementById('total-bag-items').innerText = '0 / 5 units';
+                document.getElementById('total-stove-units').innerText = '0 slots';
+                document.getElementById('total').innerText = '₹0.00';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
+            let subtotal = 0;
+            let totalCookingUnits = 0;
+            let totalBagUnits = 0;
+
+            cartItemsEl.innerHTML = session.cart.map(item => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+                totalCookingUnits += (item.stoveUnits * item.qty);
+                totalBagUnits += item.qty;
+
+                return `
+                    <div class="flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-slate-300 font-medium">${item.qty}x ${item.name}</span>
+                            <span class="text-[10px] text-slate-500 font-mono block">${item.stoveUnits * item.qty} line slot(s) | ${item.qty} bag unit(s)</span>
+                        </div>
+                        <span class="font-mono text-slate-400">₹${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('subtotal').innerText = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('total-bag-items').innerText = `${totalBagUnits} / 5 units`;
+            document.getElementById('total-stove-units').innerText = `${totalCookingUnits} slots`;
+            document.getElementById('total').innerText = `₹${(subtotal + 15).toFixed(2)}`;
+            checkoutBtn.disabled = false;
+        }
+
+        function restoreSessionStatusUI() {
+            const session = userSessions[currentRole];
+            const banner = document.getElementById('status-banner');
+            const stateText = document.getElementById('order-state');
+            const subText = document.getElementById('order-subtext');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const fallbackModal = document.getElementById('pickup-fallback-modal');
+            const fleetPill = document.getElementById('fleet-attribution-pill');
+            const fleetText = document.getElementById('fleet-attribution-text');
+
+            if (session.activeOrderId) {
+                checkoutBtn.classList.add('hidden');
+                banner.classList.remove('hidden');
+                banner.className = session.bannerClass || 'mt-4 p-3.5 rounded-xl border bg-sky-900/30 border-sky-500/30 text-center';
+                stateText.innerText = session.statusState || 'PENDING (ACID Queued)';
+                subText.innerText = session.statusSubtext || 'Sent to KOT terminal.';
+
+                if (session.attributionText) {
+                    fleetPill.classList.remove('hidden');
+                    fleetPill.className = session.attributionClass;
+                    fleetText.innerText = session.attributionText;
+                } else {
+                    fleetPill.classList.add('hidden');
+                }
+
+                if (session.showFallback) {
+                    banner.classList.add('hidden');
+                    fallbackModal.classList.remove('hidden');
+                } else {
+                    fallbackModal.classList.add('hidden');
+                }
+            } else {
+                checkoutBtn.classList.remove('hidden');
+                banner.classList.add('hidden');
+                fleetPill.classList.add('hidden');
+                fallbackModal.classList.add('hidden');
+            }
         }
 
         function placeOrder() {
+            const session = userSessions[currentRole];
+            if(!activeRestaurant) {
+                alert('Please select a dining outlet first.');
+                return;
+            }
+
             const dropoff = document.getElementById('dropoff').value;
-            
-            // Broadcast event to Restaurant Tab
+            const customerName = document.getElementById('cust-name').value;
+            const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+
+            let subtotal = 0;
+            let totalCookingUnits = 0;
+            let totalItemQuantity = 0;
+            const itemSummaries = [];
+
+            session.cart.forEach(item => {
+                subtotal += (item.price * item.qty);
+                totalCookingUnits += (item.stoveUnits * item.qty);
+                totalItemQuantity += item.qty;
+                itemSummaries.push(`${item.qty}x ${item.name}`);
+            });
+
+            session.activeOrderId = newOrderId;
+            session.statusState = 'PENDING (ACID Queued)';
+            session.statusSubtext = `Sent to ${activeRestaurant} KOT terminal.`;
+            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-sky-900/30 border-sky-500/30 text-center';
+
             channel.postMessage({
                 type: 'NEW_ORDER',
                 payload: {
-                    id: 'ORD-' + Math.floor(Math.random() * 10000),
+                    id: newOrderId,
+                    role: currentRole,
                     restaurant: activeRestaurant,
-                    customer: 'Rahul Sharma',
+                    customer: customerName,
                     destination: dropoff,
-                    total: (cartTotal + 15).toFixed(2)
+                    items: session.cart,
+                    itemCount: totalItemQuantity, // CRITICAL: uniform bag item calculation
+                    totalStoveUnits: totalCookingUnits,
+                    itemsDescription: itemSummaries.join(', '),
+                    total: (subtotal + 15).toFixed(2)
                 }
             });
 
-            // Update UI
-            document.getElementById('checkout-btn').classList.add('hidden');
-            document.getElementById('status-banner').classList.remove('hidden');
+            restoreSessionStatusUI();
         }
 
-        // Listen for Restaurant/Driver Updates
+        function handleCustomerChoice(choice) {
+            const session = userSessions[currentRole];
+            const modal = document.getElementById('pickup-fallback-modal');
+
+            modal.classList.add('hidden');
+            session.showFallback = false;
+
+            if (choice === 'PICKUP') {
+                session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-yellow-900/40 border-yellow-500/60 text-center';
+                session.statusState = 'SELF-PICKUP CONFIRMED';
+                session.statusSubtext = `Please collect your food at ${activeRestaurant}. Collect your ₹15 cash refund at counter!`;
+
+                channel.postMessage({
+                    type: 'CUSTOMER_FALLBACK_CHOICE',
+                    payload: { orderId: session.activeOrderId, choice: 'PICKUP', restaurant: activeRestaurant }
+                });
+                restoreSessionStatusUI();
+            } else {
+                session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-rose-900/40 border-rose-500/60 text-center';
+                session.statusState = 'ORDER CANCELLED (NO DRIVERS)';
+                session.statusSubtext = 'Order cancelled. ₹15 delivery fee refunded; food retained by kitchen.';
+
+                channel.postMessage({
+                    type: 'CUSTOMER_FALLBACK_CHOICE',
+                    payload: { orderId: session.activeOrderId, choice: 'CANCEL', restaurant: activeRestaurant }
+                });
+                restoreSessionStatusUI();
+
+                setTimeout(() => {
+                    session.activeOrderId = null;
+                    session.cart = [];
+                    renderActiveCartUI();
+                    restoreSessionStatusUI();
+                }, 3500);
+            }
+        }
+
+        function selectRestaurant(name) {
+            activeRestaurant = name;
+            
+            document.querySelectorAll('.canteen-card').forEach(c => c.classList.remove('border-emerald-500', 'bg-slate-900/50'));
+            const activeCard = document.getElementById('card-' + name.replace(/[\s\(\)]/g, ''));
+            if(activeCard) activeCard.classList.add('border-emerald-500', 'bg-slate-900/50');
+
+            const surgeBanner = document.getElementById('outlet-surge-alert');
+            if (surgeOutlets.has(name)) {
+                surgeBanner.classList.remove('hidden');
+                document.getElementById('surge-outlet-name').innerText = name;
+            } else {
+                surgeBanner.classList.add('hidden');
+            }
+
+            document.getElementById('menu-section').classList.remove('hidden');
+            document.getElementById('menu-title').innerText = name;
+            document.getElementById('menu-subtitle').innerText = `${diningHubs[name].menu.length} items available`;
+
+            const menuGrid = document.getElementById('menu-items-grid');
+            menuGrid.innerHTML = diningHubs[name].menu.map(item => `
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-3.5 flex justify-between items-center hover:border-slate-700 transition">
+                    <div>
+                        <div class="flex items-center space-x-1.5 mb-1">
+                            <span class="text-[9px] bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800">${item.category}</span>
+                            <span class="text-[10px] text-slate-500">${item.prep}</span>
+                            <span class="text-[9px] bg-amber-500/10 text-amber-400 px-1 py-0.5 rounded border border-amber-500/20">${item.stoveUnits} line slot(s)</span>
+                        </div>
+                        <h4 class="font-bold text-xs text-slate-200">${item.name}</h4>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-mono text-xs text-emerald-400 font-bold">₹${item.price.toFixed(2)}</span>
+                        <button onclick="addToCart('${item.name}', ${item.price}, ${item.stoveUnits})" class="bg-slate-800 hover:bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold transition">Add +</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCanteenCards() {
+            const container = document.getElementById('canteen-cards');
+            container.innerHTML = Object.keys(diningHubs).map(name => {
+                const isSurging = surgeOutlets.has(name);
+                return `
+                    <div class="canteen-card bg-cardbg border ${isSurging ? 'border-orange-500/60 shadow-[0_0_12px_rgba(249,115,22,0.15)]' : 'border-bordercolor'} rounded-xl p-4 hover:border-emerald-500/50 cursor-pointer transition" onclick="selectRestaurant('${name}')" id="card-${name.replace(/[\s\(\)]/g, '')}">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-sm text-emerald-400 line-clamp-1">${name}</h4>
+                            ${isSurging ? '<span class="text-[9px] bg-orange-500/20 text-orange-400 px-1 py-0.5 rounded font-mono font-bold">+15m Rush</span>' : ''}
+                        </div>
+                        <p class="text-[11px] text-slate-400 mb-2.5"><i class="fa-solid fa-location-dot mr-1"></i> ${diningHubs[name].zone}</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${diningHubs[name].tags.map(t => `<span class="text-[9px] bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded text-slate-300 font-medium">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         channel.onmessage = (event) => {
             const data = event.data;
+
             if (data.type === 'STATUS_UPDATE') {
-                const banner = document.getElementById('status-banner');
-                const stateText = document.getElementById('order-state');
-                
-                if (data.payload.status === 'PREPARING') {
-                    banner.className = 'mt-4 p-3 rounded-lg bg-orange-900/30 border border-orange-500/30 text-center';
-                    stateText.className = 'text-xs font-bold text-orange-400 uppercase tracking-wider mb-1';
-                    stateText.innerText = 'Food is Preparing';
-                    banner.querySelector('p:last-child').innerText = 'The kitchen is preparing your order.';
-                } 
-                else if (data.payload.status === 'IN_TRANSIT') {
-                    banner.className = 'mt-4 p-3 rounded-lg bg-purple-900/30 border border-purple-500/30 text-center';
-                    stateText.className = 'text-xs font-bold text-purple-400 uppercase tracking-wider mb-1';
-                    stateText.innerText = 'Out for Delivery';
-                    banner.querySelector('p:last-child').innerText = 'Driver is heading to ' + document.getElementById('dropoff').value;
+                for (const roleKey in userSessions) {
+                    const session = userSessions[roleKey];
+                    if (session.activeOrderId === data.payload.orderId) {
+                        if (data.payload.status === 'PREPARING') {
+                            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-orange-900/30 border-orange-500/30 text-center';
+                            session.statusState = 'PREPARING (Kitchen Accepted)';
+                            session.statusSubtext = (data.payload.surgeDelay > 0)
+                                ? 'Food is cooking. Line backlog adds +15 mins.'
+                                : 'Food is being prepared on kitchen cooking slots.';
+                        }
+                        else if (data.payload.status === 'READY') {
+                            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-yellow-900/30 border-yellow-500/30 text-center';
+                            session.statusState = 'ORDER READY (Routing Fleet)';
+                            session.statusSubtext = 'Food packaged. Dispatching to nearest staged driver...';
+                        }
+                        else if (data.payload.status === 'IN_TRANSIT') {
+                            session.activeDriverId = data.payload.driverId;
+                            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-purple-900/30 border-purple-500/30 text-center';
+                            session.statusState = 'IN_TRANSIT (Driver Dispatched)';
+                            session.statusSubtext = `${data.payload.driver} is en route to gate.`;
+
+                            if (data.payload.isSpillover) {
+                                session.attributionClass = 'mt-2 p-1.5 rounded bg-yellow-950/80 border border-yellow-500/40 text-[10px] font-mono text-yellow-300 flex items-center justify-center space-x-1.5';
+                                session.attributionText = `Cross-Campus Unit Dispatched (${data.payload.driverHub} Staged | +3m buffer)`;
+                            } else {
+                                session.attributionClass = 'mt-2 p-1.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-[10px] font-mono text-emerald-300 flex items-center justify-center space-x-1.5';
+                                session.attributionText = `Dedicated Local Unit (${data.payload.driverHub} Staged)`;
+                            }
+                        }
+                        else if (data.payload.status === 'DELIVERED') {
+                            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-emerald-900/30 border-emerald-500/30 text-center';
+                            session.statusState = 'DELIVERED (Handover Complete)';
+                            session.statusSubtext = 'Order fulfilled at authorized campus gate.';
+                            session.attributionText = null;
+
+                            setTimeout(() => {
+                                session.activeOrderId = null;
+                                session.cart = [];
+                                if (currentRole === roleKey) {
+                                    renderActiveCartUI();
+                                    restoreSessionStatusUI();
+                                }
+                            }, 3000);
+                        }
+                        else if (data.payload.status === 'CANCELLED') {
+                            session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-rose-900/40 border-rose-500/60 text-center';
+                            session.statusState = 'ORDER REJECTED BY KITCHEN';
+                            session.statusSubtext = data.payload.reason || 'Kitchen line saturation reached.';
+
+                            setTimeout(() => {
+                                session.activeOrderId = null;
+                                session.cart = [];
+                                if (currentRole === roleKey) {
+                                    renderActiveCartUI();
+                                    restoreSessionStatusUI();
+                                }
+                            }, 3500);
+                        }
+
+                        if (currentRole === roleKey) {
+                            restoreSessionStatusUI();
+                        }
+                    }
+                }
+            }
+            else if (data.type === 'ALL_DRIVERS_DECLINED') {
+                for (const roleKey in userSessions) {
+                    const session = userSessions[roleKey];
+                    if (session.activeOrderId === data.payload.orderId) {
+                        session.showFallback = true;
+                        if (currentRole === roleKey) restoreSessionStatusUI();
+                    }
+                }
+            }
+            else if (data.type === 'TELEMETRY_ANOMALY') {
+                const session = userSessions[currentRole];
+                if (session.activeDriverId === data.payload.driverId) {
+                    document.getElementById('telemetry-warning-badge').classList.remove('hidden');
+                }
+            }
+            else if (data.type === 'TELEMETRY_RESTORED') {
+                const session = userSessions[currentRole];
+                if (session.activeDriverId === data.payload.driverId) {
+                    document.getElementById('telemetry-warning-badge').classList.add('hidden');
                 }
             }
         };
+
+        renderCanteenCards();
+        updateDropOffLocations();
+        selectRestaurant('Main Canteen (Academic Canteen)');
     </script>
 </body>
 </html>

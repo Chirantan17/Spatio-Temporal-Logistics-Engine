@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Delivery - Driver Dispatch</title>
+    <title>Campus Delivery - Driver Fleet Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,7 +12,7 @@
 </head>
 <body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- GLOBAL ROLE SWITCHER -->
+    <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-500/30">
@@ -20,108 +20,195 @@
             </div>
             <div>
                 <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
-                <p class="text-xs text-slate-400">Driver Telemetry & Dispatch</p>
+                <p class="text-xs text-slate-400">Driver Telemetry, Bag Capacity & Fleet Dispatch</p>
             </div>
         </div>
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
-            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
-            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
-            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
-            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
-            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+
+        <!-- SIMULATION ACTION BAR -->
+        <div class="flex items-center space-x-3">
+            <button id="gps-toggle-btn" onclick="toggleGpsSimulation()" class="px-3 py-1.5 bg-slate-900 border border-slate-700 hover:border-rose-500 text-slate-300 hover:text-rose-400 text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-satellite" id="gps-icon"></i>
+                <span id="gps-status-lbl">Simulate GPS Blackout</span>
+            </button>
+
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
+                <button onclick="switchView('radar')" id="view-btn-radar" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition flex items-center">
+                    <i class="fa-solid fa-satellite-dish mr-1.5"></i> Radar & Active Trip
+                </button>
+                <button onclick="switchView('analytics')" id="view-btn-analytics" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center">
+                    <i class="fa-solid fa-chart-line mr-1.5"></i> Fleet Analytics
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- DRIVER WORKSPACE -->
-    <main class="flex-1 p-8 max-w-6xl mx-auto w-full grid grid-cols-12 gap-8">
+    <!-- HUB FILTER / FLEET ROSTER SELECTOR -->
+    <div class="bg-cardbg border-b border-bordercolor px-6 py-2.5 flex space-x-2 items-center overflow-x-auto min-h-[46px] text-xs">
+        <span class="font-bold text-slate-400 uppercase tracking-wider font-mono flex-shrink-0 mr-1">
+            <i class="fa-solid fa-store text-orange-400 mr-1"></i> Staging Hub:
+        </span>
+        <button onclick="filterFleetByHub('ALL')" id="filter-hub-ALL" class="hub-pill px-3 py-1 rounded-md font-bold bg-indigo-600 text-white transition flex-shrink-0">All Hubs (10 Drivers)</button>
+        <button onclick="filterFleetByHub('Main Canteen (Academic Canteen)')" id="filter-hub-Main Canteen (Academic Canteen)" class="hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0">Main Canteen (2)</button>
+        <button onclick="filterFleetByHub('SAC Canteen')" id="filter-hub-SAC Canteen" class="hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0">SAC (2)</button>
+        <button onclick="filterFleetByHub('Yummpys')" id="filter-hub-Yummpys" class="hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0">Yummpys (2)</button>
+        <button onclick="filterFleetByHub('Central Library Cafe')" id="filter-hub-Central Library Cafe" class="hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0">Library (2)</button>
+        <button onclick="filterFleetByHub('Hostel Circle Late-Night Hub')" id="filter-hub-Hostel Circle Late-Night Hub" class="hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0">Hostel Hub (2)</button>
+    </div>
+
+    <!-- DYNAMIC PROXIMITY SUB-TABS -->
+    <div class="bg-cardbg border-b border-bordercolor px-6 py-2.5 flex space-x-2 items-center overflow-x-auto min-h-[46px]">
+        <span class="text-xs font-bold text-slate-400 mr-2 uppercase tracking-wider font-mono flex-shrink-0">
+            <i class="fa-solid fa-arrow-down-short-wide text-indigo-400 mr-1"></i> Active Driver Tab:
+        </span>
+        <div id="driver-tabs-container" class="flex space-x-2 items-center"></div>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-1 p-8 max-w-7xl mx-auto w-full">
         
-        <!-- DISPATCH RADAR (LEFT COLUMN) -->
-        <div class="col-span-7 space-y-6">
-            <div class="flex justify-between items-center border-b border-bordercolor pb-3">
-                <h2 class="text-xl font-bold flex items-center">
-                    <i class="fa-solid fa-satellite-dish text-indigo-400 mr-2 animate-pulse"></i> Dispatch Radar
-                </h2>
-                <span class="text-xs text-slate-400 font-mono">GiST KNN Index Active</span>
-            </div>
+        <!-- VIEW 1: RADAR & BATCHED ACTIVE TRIPS -->
+        <div id="section-radar" class="grid grid-cols-12 gap-8">
             
-            <div id="dispatch-queue" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                <!-- Orders appear here when Kitchen marks them PREPARING -->
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center" id="empty-radar">
-                    <div class="inline-block p-4 rounded-full bg-slate-800 mb-3">
-                        <i class="fa-solid fa-map-location-dot text-2xl text-slate-500"></i>
+            <!-- DISPATCH RADAR -->
+            <div class="col-span-6 space-y-6">
+                <div class="flex justify-between items-center border-b border-bordercolor pb-3">
+                    <div>
+                        <h2 class="text-lg font-bold flex items-center">
+                            <i class="fa-solid fa-satellite-dish text-indigo-400 mr-2 animate-pulse"></i> Targeted Dispatch Radar
+                        </h2>
+                        <p class="text-[11px] text-slate-500 font-mono">Sequential Handshake | Staged Hub Priority</p>
                     </div>
-                    <p class="text-sm text-slate-400 font-bold">Scanning for nearby pickups...</p>
-                    <p class="text-xs text-slate-500 mt-1">Waiting for kitchens to begin preparation.</p>
+                    <span class="text-xs text-slate-400 font-mono bg-slate-800 px-2.5 py-1 rounded border border-slate-700" id="queue-status-badge">
+                        Queue Idle
+                    </span>
                 </div>
+                
+                <div id="dispatch-queue" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center" id="empty-radar">
+                        <div class="inline-block p-4 rounded-full bg-slate-800 mb-3">
+                            <i class="fa-solid fa-map-location-dot text-2xl text-slate-500"></i>
+                        </div>
+                        <p class="text-sm text-slate-400 font-bold" id="radar-empty-title">Radar Idle</p>
+                        <p class="text-xs text-slate-500 mt-1" id="radar-empty-desc">Waiting for restaurant to initiate sequential dispatch routing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DRIVER CARD & BATCHED DELIVERY STACK -->
+            <div class="col-span-6 space-y-6">
+                
+                <!-- ACTIVE PROFILE & BAG CAPACITY CARD -->
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 relative overflow-hidden" id="driver-profile-card">
+                    <div class="relative z-10 flex justify-between items-start mb-3">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-bold text-base text-white" id="card-driver-name">Driver Suresh</h3>
+                                <span id="hub-badge" class="bg-orange-500/20 text-orange-400 border border-orange-500/40 text-[10px] font-mono px-2 py-0.5 rounded font-bold">Main Canteen Staged</span>
+                            </div>
+                            <p class="text-xs text-slate-400 font-mono mt-0.5" id="card-driver-id">ID: DRV-002</p>
+                        </div>
+                        
+                        <!-- TWO EXPLICIT STATUS BUTTONS -->
+                        <div class="flex items-center space-x-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                            <button id="btn-status-online" onclick="setDriverStatus(true)" class="px-2.5 py-1 rounded text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i>
+                                <span>Online</span>
+                            </button>
+                            <button id="btn-status-offline" onclick="setDriverStatus(false)" class="px-2.5 py-1 rounded text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-power-off text-[9px]"></i>
+                                <span>Offline</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 5-ITEM PHYSICAL BAG CAPACITY GAUGE -->
+                    <div class="my-3 p-3 bg-slate-950 rounded-lg border border-slate-800">
+                        <div class="flex justify-between text-[11px] mb-1 font-mono">
+                            <span class="text-slate-400 flex items-center">
+                                <i class="fa-solid fa-box-archive mr-1.5 text-indigo-400"></i> Thermal Bag Capacity (Uniform 5 Items Max)
+                            </span>
+                            <span id="bag-capacity-lbl" class="text-indigo-400 font-bold">0 / 5 Items Stowed</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div id="bag-capacity-bar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-1.5 italic" id="bag-capacity-footnote">
+                            Uniform limit: Drivers can take as many orders as fit within the 5-item bag volume.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 text-center border-t border-slate-800 pt-3">
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <p class="text-[9px] text-slate-500 uppercase font-bold">Base Pay</p>
+                            <p class="text-sm font-mono font-bold text-emerald-400" id="stat-base-pay">₹0</p>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <p class="text-[9px] text-slate-500 uppercase font-bold">Bonuses</p>
+                            <p class="text-sm font-mono font-bold text-yellow-400" id="stat-bonuses">₹0</p>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <p class="text-[9px] text-slate-500 uppercase font-bold">Completed Drops</p>
+                            <p class="text-sm font-mono font-bold text-slate-200" id="stat-trips">0</p>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <p class="text-[9px] text-slate-500 uppercase font-bold">Bag Status</p>
+                            <p class="text-xs font-mono font-bold text-emerald-400 mt-0.5" id="stat-bag-state">SPACE AVAILABLE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BATCHED ACTIVE ORDERS CONTAINER -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center border-b border-bordercolor pb-2">
+                        <h3 class="text-sm font-bold text-white flex items-center">
+                            <i class="fa-solid fa-layer-group text-sky-400 mr-2"></i> Current Bag Stowage (Active Run)
+                        </h3>
+                        <span id="active-stack-count" class="text-xs font-mono text-slate-400">0 Orders In Transit</span>
+                    </div>
+
+                    <div id="active-trips-list" class="space-y-4 max-h-[440px] overflow-y-auto pr-1">
+                        <div class="p-6 bg-slate-900/60 border border-slate-800 rounded-xl text-center text-xs text-slate-500 italic" id="empty-trips-msg">
+                            No active deliveries currently in bag.
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- ACTIVE TRIP & TELEMETRY (RIGHT COLUMN) -->
-        <div class="col-span-5 space-y-6">
-            
-            <!-- DRIVER STATUS CARD -->
-            <div class="bg-cardbg border border-bordercolor rounded-xl p-5 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full -z-0"></div>
-                <div class="relative z-10 flex justify-between items-center mb-4">
-                    <div>
-                        <h3 class="font-bold text-lg text-white">Driver: Vikram</h3>
-                        <p class="text-xs text-slate-400 font-mono">ID: DRV-004 | Zone: Academic</p>
-                    </div>
-                    <button id="status-toggle" onclick="toggleStatus()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded font-bold text-xs transition shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                        ONLINE
-                    </button>
+        <!-- VIEW 2: INDIVIDUAL ANALYTICS -->
+        <div id="section-analytics" class="hidden space-y-6">
+            <div class="border-b border-bordercolor pb-3 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-chart-pie text-indigo-400 mr-2"></i> Comprehensive Fleet Health & Ledger
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="analytics-active-driver-lbl">Driver Suresh (Main Canteen Staged)</p>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-2 text-center border-t border-slate-800 pt-4">
-                    <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
-                        <p class="text-[10px] text-slate-500 uppercase font-bold">Today's Trips</p>
-                        <p class="text-lg font-mono font-bold text-slate-200">14</p>
-                    </div>
-                    <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
-                        <p class="text-[10px] text-slate-500 uppercase font-bold">Distance</p>
-                        <p class="text-lg font-mono font-bold text-slate-200">12.4 <span class="text-xs text-slate-500">km</span></p>
-                    </div>
-                </div>
+                <span class="text-xs font-mono bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded border border-indigo-500/30">10 Total Fleet Units Stationed</span>
             </div>
 
-            <!-- ACTIVE DELIVERY CARD -->
-            <div id="active-trip" class="bg-cardbg border border-indigo-500/50 rounded-xl p-6 shadow-[0_0_15px_rgba(99,102,241,0.1)] hidden">
-                <div class="flex justify-between items-start mb-4 border-b border-slate-800 pb-4">
-                    <div>
-                        <span class="bg-indigo-500/20 text-indigo-400 text-[10px] px-2 py-1 rounded font-bold mb-2 inline-block">ACTIVE DELIVERY</span>
-                        <h3 class="font-bold text-white text-lg" id="trip-order-id">ORD-1234</h3>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-slate-400">ETA</p>
-                        <p class="font-mono text-emerald-400 font-bold">8 Mins</p>
-                    </div>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Shift Earnings</p>
+                    <p class="text-2xl font-mono font-bold text-emerald-400 mt-1" id="dash-total-earnings">₹0.00</p>
+                    <p class="text-[10px] text-slate-500 mt-1">₹15 standard per completed drop</p>
                 </div>
-
-                <div class="space-y-4 mb-6 relative">
-                    <!-- Vertical Line for Map visual -->
-                    <div class="absolute left-2.5 top-3 bottom-3 w-0.5 bg-slate-800"></div>
-                    
-                    <div class="flex items-start">
-                        <div class="w-5 h-5 rounded-full bg-slate-800 border-2 border-orange-400 z-10 mr-3 flex-shrink-0"></div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-500 uppercase">Pickup Geofence</p>
-                            <p class="text-sm font-bold text-slate-200" id="trip-pickup">Main Canteen</p>
-                            <p class="text-[10px] text-slate-500 mt-1"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>ST_DWithin: Valid</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start pt-2">
-                        <div class="w-5 h-5 rounded-full bg-slate-800 border-2 border-sky-400 z-10 mr-3 flex-shrink-0"></div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-500 uppercase">Drop-off Point</p>
-                            <p class="text-sm font-bold text-sky-400" id="trip-dropoff">Hostel 1 Entrance Gate</p>
-                        </div>
-                    </div>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Outlet Escalation Bonuses</p>
+                    <p class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="dash-bonuses">₹0.00</p>
+                    <p class="text-[10px] text-slate-500 mt-1">+₹50 kitchen bonus for last-driver pickup</p>
                 </div>
-
-                <button onclick="completeDelivery()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-indigo-900/20">
-                    <i class="fa-solid fa-flag-checkered mr-2"></i> Mark as Delivered
-                </button>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Trajectory Distance</p>
+                    <p class="text-2xl font-mono font-bold text-sky-400 mt-1" id="dash-distance">0.0 <span class="text-xs text-slate-400">km</span></p>
+                    <p class="text-[10px] text-slate-500 mt-1">Tracked via location_trace GPS pings</p>
+                </div>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Current Bag Stowed</p>
+                    <p class="text-2xl font-mono font-bold text-indigo-400 mt-1" id="dash-bag-stat">0 / 5</p>
+                    <p class="text-[10px] text-slate-500 mt-1" id="dash-bag-sub">5 items maximum bag capacity</p>
+                </div>
             </div>
         </div>
 
@@ -129,107 +216,582 @@
 
     <script>
         const channel = new BroadcastChannel('campus_delivery');
-        let availableOrders = [];
-        let isOnline = true;
-        let activeOrderId = null;
 
-        function toggleStatus() {
-            const btn = document.getElementById('status-toggle');
-            isOnline = !isOnline;
-            if (isOnline) {
-                btn.className = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-3 py-1 rounded font-bold text-xs transition shadow-[0_0_10px_rgba(16,185,129,0.2)]';
-                btn.innerText = 'ONLINE';
+        const restaurantLocations = {
+            'Main Canteen (Academic Canteen)': { x: 78.5415, y: 17.5215, terrainMultiplier: 1.0, zoneType: 'Paved Ring Road' },
+            'SAC Canteen':                     { x: 78.5375, y: 17.5220, terrainMultiplier: 1.4, zoneType: 'Sports Pathway (Slow Zone)' },
+            'Yummpys':                         { x: 78.5435, y: 17.5235, terrainMultiplier: 1.1, zoneType: 'Central Boulevard' },
+            'Central Library Cafe':            { x: 78.5425, y: 17.5210, terrainMultiplier: 2.2, zoneType: 'Pedestrian Mall (10 km/h Limit)' },
+            'Hostel Circle Late-Night Hub':    { x: 78.5455, y: 17.5250, terrainMultiplier: 1.2, zoneType: 'Hostel Ring Arterial' }
+        };
+
+        const MAX_BAG_CAPACITY = 5; // Uniform physical bag limit across all drivers
+
+        let fleet = [
+            { id: 'DRV-001', name: 'Driver Ramesh', hub: 'Main Canteen (Academic Canteen)', loc: { x: 78.5416, y: 17.5214 }, online: true, basePay: 45, bonuses: 0, trips: 3, distanceKm: 4.2, accepted: 3, rejected: 0, activeOrders: [] },
+            { id: 'DRV-002', name: 'Driver Suresh', hub: 'Main Canteen (Academic Canteen)', loc: { x: 78.5414, y: 17.5216 }, online: true, basePay: 15, bonuses: 0, trips: 1, distanceKm: 1.4, accepted: 1, rejected: 0, activeOrders: [] },
+            { id: 'DRV-003', name: 'Driver Anita',  hub: 'SAC Canteen',                     loc: { x: 78.5374, y: 17.5219 }, online: true, basePay: 60, bonuses: 50, trips: 4, distanceKm: 5.6, accepted: 4, rejected: 1, activeOrders: [] },
+            { id: 'DRV-004', name: 'Driver Vikram', hub: 'SAC Canteen',                     loc: { x: 78.5377, y: 17.5222 }, online: true, basePay: 90, bonuses: 0, trips: 6, distanceKm: 8.4, accepted: 6, rejected: 0, activeOrders: [] },
+            { id: 'DRV-005', name: 'Driver Pooja',  hub: 'Yummpys',                         loc: { x: 78.5434, y: 17.5234 }, online: true, basePay: 30, bonuses: 0, trips: 2, distanceKm: 2.8, accepted: 2, rejected: 0, activeOrders: [] },
+            { id: 'DRV-006', name: 'Driver Karan',  hub: 'Yummpys',                         loc: { x: 78.5437, y: 17.5236 }, online: true, basePay: 0,  bonuses: 0, trips: 0, distanceKm: 0.0, accepted: 0, rejected: 0, activeOrders: [] },
+            { id: 'DRV-007', name: 'Driver Deepak', hub: 'Central Library Cafe',            loc: { x: 78.5424, y: 17.5211 }, online: true, basePay: 15, bonuses: 0, trips: 1, distanceKm: 1.2, accepted: 1, rejected: 0, activeOrders: [] },
+            { id: 'DRV-008', name: 'Driver Sneha',  hub: 'Central Library Cafe',            loc: { x: 78.5427, y: 17.5209 }, online: true, basePay: 45, bonuses: 0, trips: 3, distanceKm: 3.9, accepted: 3, rejected: 0, activeOrders: [] },
+            { id: 'DRV-009', name: 'Driver Farhan', hub: 'Hostel Circle Late-Night Hub',    loc: { x: 78.5454, y: 17.5251 }, online: true, basePay: 30, bonuses: 0, trips: 2, distanceKm: 2.5, accepted: 2, rejected: 0, activeOrders: [] },
+            { id: 'DRV-010', name: 'Driver Imran',  hub: 'Hostel Circle Late-Night Hub',    loc: { x: 78.5457, y: 17.5249 }, online: false, basePay: 0,  bonuses: 0, trips: 0, distanceKm: 0.0, accepted: 0, rejected: 0, activeOrders: [] }
+        ];
+
+        let selectedHubFilter = 'ALL';
+        let rankedDrivers = []; 
+        let activeDriverId = 'DRV-002'; 
+        let currentOrder = null; 
+        let isGpsBlackout = false;
+
+        function calcDistance(p1, p2) {
+            const dx = (p1.x - p2.x) * 105;
+            const dy = (p1.y - p2.y) * 111;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function getDriverBagLoad(driver) {
+            return driver.activeOrders.reduce((sum, ord) => sum + (ord.itemCount || 1), 0);
+        }
+
+        // HIERARCHICAL DISPATCH: Available Staged Local Drivers -> Neighboring Spillover
+        function sortFleetForRestaurant(restaurantName) {
+            const rest = restaurantLocations[restaurantName] || { x: 78.5415, y: 17.5215, terrainMultiplier: 1.0, zoneType: 'Standard Corridor' };
+            
+            rankedDrivers = fleet.map(d => {
+                const dist = calcDistance(d.loc, rest);
+                const temporalCost = (dist * rest.terrainMultiplier * 3.2).toFixed(1);
+                const isLocal = (d.hub === restaurantName);
+                const bagLoad = getDriverBagLoad(d);
+                const isBagFull = (bagLoad >= MAX_BAG_CAPACITY);
+                const isAvailable = (d.online && !isBagFull);
+                
+                return { 
+                    ...d, 
+                    currentDistance: dist.toFixed(2),
+                    temporalCost: temporalCost,
+                    zoneType: rest.zoneType,
+                    isLocalStaged: isLocal,
+                    bagLoad: bagLoad,
+                    isBagFull: isBagFull,
+                    isAvailable: isAvailable
+                };
+            });
+
+            // Priority:
+            // 1. Available online drivers with bag space staged locally
+            // 2. Available online drivers with bag space via KNN
+            // 3. Offline or bag-full drivers sink to the end
+            rankedDrivers.sort((a, b) => {
+                if (a.isAvailable !== b.isAvailable) return a.isAvailable ? -1 : 1;
+                if (a.isLocalStaged !== b.isLocalStaged) return a.isLocalStaged ? -1 : 1;
+                return parseFloat(a.currentDistance) - parseFloat(b.currentDistance);
+            });
+        }
+
+        function filterFleetByHub(hub) {
+            selectedHubFilter = hub;
+            document.querySelectorAll('.hub-pill').forEach(btn => {
+                btn.className = 'hub-pill px-3 py-1 rounded-md font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition flex-shrink-0';
+            });
+            const activePill = document.getElementById('filter-hub-' + hub);
+            if(activePill) activePill.className = 'hub-pill px-3 py-1 rounded-md font-bold bg-indigo-600 text-white transition flex-shrink-0';
+            
+            renderSubTabs();
+        }
+
+        function renderSubTabs() {
+            const container = document.getElementById('driver-tabs-container');
+            let listToRender = (rankedDrivers.length > 0) ? rankedDrivers : fleet;
+
+            if (selectedHubFilter !== 'ALL') {
+                listToRender = listToRender.filter(d => d.hub === selectedHubFilter);
+            }
+
+            container.innerHTML = listToRender.map(d => {
+                const currentFleetDriver = fleet.find(f => f.id === d.id);
+                const isSelected = (d.id === activeDriverId);
+                const bagLoad = getDriverBagLoad(currentFleetDriver);
+                const isBagFull = (bagLoad >= MAX_BAG_CAPACITY);
+                
+                let badge = '';
+                if (!currentFleetDriver.online) {
+                    badge = `<span class="ml-1.5 text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-500 font-mono">OFFLINE</span>`;
+                } else if (isBagFull) {
+                    badge = `<span class="ml-1.5 text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold font-mono">BAG FULL</span>`;
+                } else if (rankedDrivers.length > 0) {
+                    badge = `<span class="ml-1.5 text-[9px] px-1 py-0.2 rounded ${d.isLocalStaged ? 'bg-emerald-500/30 text-emerald-300 font-extrabold' : 'bg-slate-800 text-slate-300'} font-mono">${d.currentDistance}km (${bagLoad}/5)</span>`;
+                } else {
+                    badge = `<span class="ml-1.5 text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400 font-mono">${bagLoad}/5 items</span>`;
+                }
+
+                return `
+                    <button onclick="selectDriver('${d.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center flex-shrink-0 ${
+                        isSelected 
+                            ? 'bg-indigo-600 text-white shadow-md' 
+                            : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                    }">
+                        <span>${d.name}</span>
+                        ${badge}
+                    </button>
+                `;
+            }).join('');
+
+            updateProfileCard();
+            renderRadar();
+        }
+
+        function selectDriver(driverId) {
+            activeDriverId = driverId;
+            renderSubTabs();
+        }
+
+        function setDriverStatus(isOnline) {
+            const d = fleet.find(drv => drv.id === activeDriverId);
+            if (!d) return;
+
+            d.online = isOnline;
+            
+            // Broadcast driver status update to KOT & Security
+            channel.postMessage({
+                type: 'DRIVER_STATUS_CHANGED',
+                payload: {
+                    driverId: d.id,
+                    driverName: d.name,
+                    hub: d.hub,
+                    online: d.online,
+                    currentBagLoad: getDriverBagLoad(d)
+                }
+            });
+
+            updateProfileCard();
+            renderSubTabs();
+        }
+
+        function updateProfileCard() {
+            const d = fleet.find(drv => drv.id === activeDriverId);
+            if (!d) return;
+
+            const bagLoad = getDriverBagLoad(d);
+            const isBagFull = (bagLoad >= MAX_BAG_CAPACITY);
+
+            document.getElementById('card-driver-name').innerText = d.name;
+            document.getElementById('card-driver-id').innerText = `ID: ${d.id} | Coords: (${d.loc.y.toFixed(4)}, ${d.loc.x.toFixed(4)})`;
+            document.getElementById('hub-badge').innerText = `Staged: ${d.hub}`;
+            document.getElementById('stat-base-pay').innerText = `₹${d.basePay}`;
+            document.getElementById('stat-bonuses').innerText = `₹${d.bonuses}`;
+            document.getElementById('stat-trips').innerText = d.trips;
+
+            // STATUS BUTTONS
+            const btnOnline = document.getElementById('btn-status-online');
+            const btnOffline = document.getElementById('btn-status-offline');
+            if (d.online) {
+                btnOnline.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center space-x-1';
+                btnOffline.className = 'px-2.5 py-1 rounded text-xs font-bold bg-slate-900 text-slate-400 hover:text-white flex items-center space-x-1';
             } else {
-                btn.className = 'bg-rose-500/20 text-rose-400 border border-rose-500/50 px-3 py-1 rounded font-bold text-xs transition';
-                btn.innerText = 'OFFLINE';
+                btnOnline.className = 'px-2.5 py-1 rounded text-xs font-bold bg-slate-900 text-slate-400 hover:text-white flex items-center space-x-1';
+                btnOffline.className = 'px-2.5 py-1 rounded text-xs font-bold bg-rose-600 text-white shadow-sm flex items-center space-x-1';
+            }
+
+            // BAG CAPACITY BAR
+            const bagBar = document.getElementById('bag-capacity-bar');
+            const bagLbl = document.getElementById('bag-capacity-lbl');
+            const footnote = document.getElementById('bag-capacity-footnote');
+            const bagState = document.getElementById('stat-bag-state');
+
+            const percent = Math.min(100, Math.round((bagLoad / MAX_BAG_CAPACITY) * 100));
+            bagBar.style.width = `${percent}%`;
+            bagLbl.innerText = `${bagLoad} / ${MAX_BAG_CAPACITY} Items Stowed (${percent}%)`;
+
+            if (isBagFull) {
+                bagBar.className = 'bg-amber-500 h-full transition-all duration-300';
+                bagState.innerText = 'BAG FULL (5/5)';
+                bagState.className = 'text-xs font-mono font-bold text-amber-400 mt-0.5';
+                footnote.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Bag at max volume (5 items). Complete drops before adding more.</span>`;
+            } else {
+                bagBar.className = 'bg-indigo-500 h-full transition-all duration-300';
+                bagState.innerText = `${MAX_BAG_CAPACITY - bagLoad} SLOTS OPEN`;
+                bagState.className = 'text-xs font-mono font-bold text-emerald-400 mt-0.5';
+                footnote.innerText = `Uniform capacity: ${MAX_BAG_CAPACITY - bagLoad} item slot(s) remaining in bag.`;
+            }
+
+            // Analytics Dashboard
+            document.getElementById('analytics-active-driver-lbl').innerText = `${d.name} (${d.hub} Staged)`;
+            document.getElementById('dash-total-earnings').innerText = `₹${(d.basePay + d.bonuses).toFixed(2)}`;
+            document.getElementById('dash-bonuses').innerText = `₹${d.bonuses.toFixed(2)}`;
+            document.getElementById('dash-distance').innerHTML = `${d.distanceKm.toFixed(1)} <span class="text-xs text-slate-400">km</span>`;
+            document.getElementById('dash-bag-stat').innerText = `${bagLoad} / ${MAX_BAG_CAPACITY}`;
+            document.getElementById('dash-bag-sub').innerText = isBagFull ? 'Bag volume fully stowed' : `${MAX_BAG_CAPACITY - bagLoad} item slots available`;
+
+            renderActiveTrips(d);
+        }
+
+        function renderActiveTrips(driver) {
+            const container = document.getElementById('active-trips-list');
+            const countLbl = document.getElementById('active-stack-count');
+            countLbl.innerText = `${driver.activeOrders.length} Order(s) in Bag`;
+
+            if (driver.activeOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 bg-slate-900/60 border border-slate-800 rounded-xl text-center text-xs text-slate-500 italic">
+                        No active deliveries currently in bag.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = driver.activeOrders.map((trip) => `
+                <div class="bg-cardbg border border-indigo-500/50 rounded-xl p-5 shadow-lg space-y-4">
+                    <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="bg-indigo-500/20 text-indigo-400 text-[10px] font-mono font-bold px-2 py-0.5 rounded">IN BAG (${trip.itemCount || 1} ITEM${(trip.itemCount || 1) > 1 ? 'S' : ''})</span>
+                            <h4 class="font-bold text-white text-sm mt-1">${trip.id}</h4>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-mono text-emerald-400 font-bold text-sm block">₹${trip.payout}.00</span>
+                            ${trip.surgeBonus > 0 ? '<span class="text-[9px] text-yellow-400 font-bold">+₹50 Bonus</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold">Pickup</p>
+                            <p class="text-slate-300 font-medium truncate">${trip.restaurant}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold">Authorized Drop Node</p>
+                            <p class="text-sky-400 font-bold truncate">${trip.destination}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <button onclick="fulfillBatchItem('${trip.id}', false)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center space-x-1.5 shadow-md shadow-emerald-950/30">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Complete Verified Drop at Gate</span>
+                        </button>
+                        <button onclick="fulfillBatchItem('${trip.id}', true)" class="w-full bg-slate-900 hover:bg-rose-950/60 border border-slate-800 hover:border-rose-600/50 text-slate-300 hover:text-rose-200 font-bold py-1.5 rounded-lg text-xs transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-person-walking-dashed-line-arrow-right text-rose-400"></i>
+                            <span>Simulate Breach (Enter Room Door)</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleGpsSimulation() {
+            isGpsBlackout = !isGpsBlackout;
+            const btn = document.getElementById('gps-toggle-btn');
+            const icon = document.getElementById('gps-icon');
+            const lbl = document.getElementById('gps-status-lbl');
+
+            if (isGpsBlackout) {
+                btn.className = 'px-3 py-1.5 bg-rose-600 text-white border border-rose-500 text-xs font-bold rounded-lg transition flex items-center space-x-1.5 animate-pulse';
+                icon.className = 'fa-solid fa-triangle-exclamation';
+                lbl.innerText = 'GPS Blackout Active (Basement)';
+
+                channel.postMessage({
+                    type: 'TELEMETRY_ANOMALY',
+                    payload: {
+                        driverId: activeDriverId,
+                        driverName: fleet.find(d => d.id === activeDriverId).name,
+                        anomalyType: 'GHOST_DRIVER_HEARTBEAT_TIMEOUT',
+                        thresholdExceeded: '> 45 seconds telemetry freeze',
+                        zone: 'Basement Corridor / Elevator Shaft'
+                    }
+                });
+            } else {
+                btn.className = 'px-3 py-1.5 bg-slate-900 border border-slate-700 hover:border-rose-500 text-slate-300 hover:text-rose-400 text-xs font-bold rounded-lg transition flex items-center space-x-1.5';
+                icon.className = 'fa-solid fa-satellite';
+                lbl.innerText = 'Simulate GPS Blackout';
+
+                channel.postMessage({
+                    type: 'TELEMETRY_RESTORED',
+                    payload: { driverId: activeDriverId }
+                });
             }
         }
 
-        // Listen for Kitchen broadcasting PREPARING status
+        function switchView(view) {
+            document.getElementById('section-radar').classList.toggle('hidden', view !== 'radar');
+            document.getElementById('section-analytics').classList.toggle('hidden', view !== 'analytics');
+
+            document.getElementById('view-btn-radar').className = (view === 'radar') 
+                ? 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition flex items-center'
+                : 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center';
+
+            document.getElementById('view-btn-analytics').className = (view === 'analytics') 
+                ? 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition flex items-center'
+                : 'px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center';
+        }
+
         channel.onmessage = (event) => {
             const data = event.data;
-            
-            // Add to radar when Kitchen accepts order
-            if (data.type === 'STATUS_UPDATE' && data.payload.status === 'PREPARING') {
-                if (!availableOrders.find(o => o.id === data.payload.orderId)) {
-                    availableOrders.push({
-                        id: data.payload.orderId,
-                        restaurant: data.payload.restaurant,
-                        destination: data.payload.destination,
-                        distance: (Math.random() * 2 + 0.5).toFixed(1) // Mock distance 0.5 - 2.5km
-                    });
-                    renderRadar();
+            if (data.type === 'STATUS_UPDATE') {
+                if (data.payload.status === 'READY') {
+                    if (!currentOrder) {
+                        sortFleetForRestaurant(data.payload.restaurant);
+                        
+                        // Extract total items in order for bag sizing
+                        const orderItemCount = data.payload.itemCount || 1;
+
+                        currentOrder = {
+                            id: data.payload.orderId,
+                            restaurant: data.payload.restaurant,
+                            destination: data.payload.destination,
+                            itemCount: orderItemCount,
+                            sequenceIndex: 0,
+                            rejectedDrivers: []
+                        };
+
+                        // Auto-select #1 available ranked driver
+                        activeDriverId = rankedDrivers[0].id;
+                        renderSubTabs();
+                    }
                 }
             }
         };
 
-        function acceptDelivery(orderId, restaurant, destination) {
-            if (!isOnline) {
-                alert("You must be ONLINE to accept deliveries.");
-                return;
-            }
-            if (activeOrderId) {
-                alert("You already have an active delivery.");
+        function acceptCurrentOrder() {
+            const currentDriver = fleet.find(d => d.id === activeDriverId);
+            if (!currentDriver.online) {
+                alert('You are currently OFFLINE. Set status to ONLINE to accept deliveries.');
                 return;
             }
 
-            activeOrderId = orderId;
-            
-            // Remove from local radar
-            availableOrders = availableOrders.filter(o => o.id !== orderId);
-            renderRadar();
+            const currentLoad = getDriverBagLoad(currentDriver);
+            const incomingItems = currentOrder.itemCount || 1;
 
-            // Populate Active Trip UI
-            document.getElementById('trip-order-id').innerText = orderId;
-            document.getElementById('trip-pickup').innerText = restaurant;
-            document.getElementById('trip-dropoff').innerText = destination;
-            document.getElementById('active-trip').classList.remove('hidden');
+            // UNIFORM BAG CAPACITY CHECK (MAX 5 ITEMS)
+            if (currentLoad + incomingItems > MAX_BAG_CAPACITY) {
+                alert(`BAG CAPACITY EXCEEDED: Cannot load ${incomingItems} items. Driver bag already contains ${currentLoad}/${MAX_BAG_CAPACITY} items.`);
+                return;
+            }
 
-            // Broadcast to Student & Kitchen that driver is IN_TRANSIT
+            const isLastDriver = (currentOrder.sequenceIndex === rankedDrivers.length - 1);
+            const surgeBonus = isLastDriver ? 50 : 0;
+
+            const newTrip = {
+                id: currentOrder.id,
+                restaurant: currentOrder.restaurant,
+                destination: currentOrder.destination,
+                itemCount: incomingItems,
+                driverId: currentDriver.id,
+                driverName: currentDriver.name,
+                payout: 15 + surgeBonus,
+                surgeBonus: surgeBonus
+            };
+
+            currentDriver.activeOrders.push(newTrip);
+            currentDriver.accepted += 1;
+
+            const orderId = currentOrder.id;
+            const rest = currentOrder.restaurant;
+            const dest = currentOrder.destination;
+            const isSpillover = (currentDriver.hub !== rest);
+
+            currentOrder = null;
+
+            updateProfileCard();
+            renderSubTabs();
+
             channel.postMessage({
                 type: 'STATUS_UPDATE',
-                payload: { orderId: orderId, status: 'IN_TRANSIT' }
+                payload: {
+                    orderId: orderId,
+                    status: 'IN_TRANSIT',
+                    driver: currentDriver.name,
+                    driverId: currentDriver.id,
+                    driverHub: currentDriver.hub,
+                    isSpillover: isSpillover,
+                    restaurant: rest,
+                    destination: dest,
+                    itemCount: incomingItems,
+                    bonusPaidByKitchen: surgeBonus
+                }
             });
         }
 
-        function completeDelivery() {
-            // Broadcast completion to Student
+        function declineCurrentOrder() {
+            if (!currentOrder) return;
+
+            const decliningDriver = fleet.find(d => d.id === activeDriverId);
+            decliningDriver.rejected += 1;
+            currentOrder.rejectedDrivers.push(activeDriverId);
+
+            const nextIndex = currentOrder.sequenceIndex + 1;
+
+            if (nextIndex < rankedDrivers.length) {
+                currentOrder.sequenceIndex = nextIndex;
+                activeDriverId = rankedDrivers[nextIndex].id;
+                renderSubTabs();
+            } else {
+                const failedOrderId = currentOrder.id;
+                const failedRest = currentOrder.restaurant;
+                const failedDest = currentOrder.destination;
+
+                currentOrder = null;
+                renderRadar();
+
+                channel.postMessage({
+                    type: 'ALL_DRIVERS_DECLINED',
+                    payload: { orderId: failedOrderId, restaurant: failedRest, destination: failedDest }
+                });
+            }
+            updateProfileCard();
+        }
+
+        function fulfillBatchItem(orderId, isBreach) {
+            const driver = fleet.find(d => d.id === activeDriverId);
+            const tripIdx = driver.activeOrders.findIndex(t => t.id === orderId);
+            if (tripIdx === -1) return;
+
+            const trip = driver.activeOrders[tripIdx];
+            driver.trips += 1; // Completed drop count incremented for pay/ledger
+            driver.basePay += 15;
+            driver.distanceKm += 1.4;
+            if (trip.surgeBonus > 0) driver.bonuses += trip.surgeBonus;
+
+            if (isBreach) {
+                channel.postMessage({
+                    type: 'SPATIAL_BREACH',
+                    payload: {
+                        driver: `${driver.name} (${driver.id})`,
+                        zone: 'Hostel 1 Interior Block',
+                        coord: '78.5465, 17.5215 (EPSG:4326)',
+                        orderId: trip.id
+                    }
+                });
+            }
+
+            driver.activeOrders.splice(tripIdx, 1);
+
             channel.postMessage({
                 type: 'STATUS_UPDATE',
-                payload: { orderId: activeOrderId, status: 'DELIVERED' }
+                payload: { orderId: trip.id, status: 'DELIVERED' }
             });
 
-            activeOrderId = null;
-            document.getElementById('active-trip').classList.add('hidden');
+            updateProfileCard();
+            renderSubTabs();
         }
 
         function renderRadar() {
             const queue = document.getElementById('dispatch-queue');
             const emptyRadar = document.getElementById('empty-radar');
+            const emptyTitle = document.getElementById('radar-empty-title');
+            const emptyDesc = document.getElementById('radar-empty-desc');
+            const badge = document.getElementById('queue-status-badge');
 
-            if (availableOrders.length === 0) {
+            if (!currentOrder) {
                 emptyRadar.classList.remove('hidden');
+                emptyTitle.innerText = 'Radar Idle';
+                emptyDesc.innerText = 'Waiting for restaurant to initiate sequential dispatch routing.';
+                badge.innerText = 'Queue Idle';
+                badge.className = 'text-xs text-slate-400 font-mono bg-slate-800 px-2.5 py-1 rounded border border-slate-700';
                 queue.innerHTML = '';
                 queue.appendChild(emptyRadar);
-            } else {
-                emptyRadar.classList.add('hidden');
-                queue.innerHTML = availableOrders.map(order => `
-                    <div class="bg-cardbg border border-indigo-500/30 rounded-xl p-4 flex justify-between items-center hover:bg-slate-800/50 transition">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded font-bold border border-slate-700">${order.distance} km away</span>
-                                <h4 class="font-bold text-slate-200">${order.id}</h4>
-                            </div>
-                            <p class="text-xs text-slate-400 font-bold"><i class="fa-solid fa-arrow-right text-slate-600 mx-1"></i> Pickup: <span class="text-orange-400">${order.restaurant}</span></p>
-                            <p class="text-xs text-slate-400 font-bold"><i class="fa-solid fa-arrow-right text-slate-600 mx-1"></i> Drop: <span class="text-sky-400">${order.destination}</span></p>
+                return;
+            }
+
+            badge.innerText = `Dispatch Active: ${currentOrder.id}`;
+            badge.className = 'text-xs text-indigo-400 font-mono font-bold bg-indigo-500/10 px-2.5 py-1 rounded border border-indigo-500/40 animate-pulse';
+
+            if (currentOrder.rejectedDrivers.includes(activeDriverId)) {
+                emptyRadar.classList.remove('hidden');
+                emptyTitle.innerText = 'Route Declined';
+                emptyDesc.innerText = `You declined order ${currentOrder.id}. Blacklisted and passed down the KNN queue.`;
+                queue.innerHTML = '';
+                queue.appendChild(emptyRadar);
+                return;
+            }
+
+            const currentTurnDriver = rankedDrivers[currentOrder.sequenceIndex];
+            if (currentTurnDriver.id !== activeDriverId) {
+                emptyRadar.classList.remove('hidden');
+                emptyTitle.innerText = 'Standby Mode';
+                emptyDesc.innerText = `Order ${currentOrder.id} is currently offered to closer/staged driver: ${currentTurnDriver.name}. You will receive it only if declined.`;
+                queue.innerHTML = '';
+                queue.appendChild(emptyRadar);
+                return;
+            }
+
+            const activeFleetDriver = fleet.find(d => d.id === activeDriverId);
+            const bagLoad = getDriverBagLoad(activeFleetDriver);
+            const incomingItems = currentOrder.itemCount || 1;
+            const willOverfill = (bagLoad + incomingItems > MAX_BAG_CAPACITY);
+            const isOffline = !activeFleetDriver.online;
+
+            emptyRadar.classList.add('hidden');
+            const isLastDriver = (currentOrder.sequenceIndex === rankedDrivers.length - 1);
+            const isLocal = (activeFleetDriver.hub === currentOrder.restaurant);
+
+            queue.innerHTML = `
+                <div class="bg-cardbg border ${willOverfill ? 'border-amber-500/60' : (isLastDriver ? 'border-yellow-500 bg-slate-900/90 shadow-[0_0_20px_rgba(234,179,8,0.2)]' : 'border-indigo-500/50')} rounded-xl p-5 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-slate-800 text-slate-200 text-xs font-mono px-2 py-0.5 rounded font-bold border border-slate-700">
+                                Priority #${currentOrder.sequenceIndex + 1}
+                            </span>
+                            <span class="${isLocal ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'} text-[10px] font-mono px-2 py-0.5 rounded font-bold">
+                                ${isLocal ? 'LOCAL STAGED DRIVER' : 'CROSS-CAMPUS SPILLOVER'}
+                            </span>
                         </div>
-                        <button onclick="acceptDelivery('${order.id}', '${order.restaurant}', '${order.destination}')" class="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/50 px-4 py-3 rounded-lg text-xs font-bold transition">
-                            Accept Route
+                        ${isLastDriver ? `
+                            <span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] font-extrabold px-2 py-1 rounded animate-pulse">
+                                +₹50.00 OUTLET INCENTIVE
+                            </span>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-white text-base">${currentOrder.id}</h4>
+                        <span class="text-xs font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">
+                            ${incomingItems} Item${incomingItems > 1 ? 's' : ''} for Bag
+                        </span>
+                    </div>
+
+                    <!-- SPATIAL METRICS -->
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 mb-3 grid grid-cols-2 gap-2 text-[11px] font-mono">
+                        <div>
+                            <span class="text-slate-500 block">PostGIS KNN (&lt;-&gt;)</span>
+                            <span class="text-sky-400 font-bold">${currentTurnDriver.currentDistance} km Euclidean</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block">Weighted Terrain ETA</span>
+                            <span class="text-indigo-400 font-bold">~${currentTurnDriver.temporalCost} mins (${currentTurnDriver.zoneType})</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 my-3 text-xs">
+                        <p class="text-slate-300"><i class="fa-solid fa-arrow-right text-orange-400 mr-2"></i> Pickup: <span class="text-white font-bold">${currentOrder.restaurant}</span></p>
+                        <p class="text-slate-300"><i class="fa-solid fa-arrow-right text-sky-400 mr-2"></i> Authorized Drop: <span class="text-sky-400 font-bold">${currentOrder.destination}</span></p>
+                        <p class="text-slate-400 font-mono text-[11px] mt-1">Delivery Comp: ₹15.00 ${isLastDriver ? '<strong class="text-yellow-400">+ ₹50.00 Restaurant Bonus = ₹65.00</strong>' : ''}</p>
+                    </div>
+
+                    ${isOffline ? `
+                        <div class="mt-4 p-3 bg-rose-950/40 border border-rose-500/40 rounded-lg text-xs text-rose-300 font-medium">
+                            <i class="fa-solid fa-power-off mr-1.5"></i> You are currently OFFLINE. Switch status to ONLINE above to accept orders.
+                        </div>
+                    ` : (willOverfill ? `
+                        <div class="mt-4 p-3 bg-amber-950/40 border border-amber-500/40 rounded-lg text-xs text-amber-300 font-medium">
+                            <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Bag Capacity Warning: This order requires ${incomingItems} items, but bag has only${MAX_BAG_CAPACITY - bagLoad} slot(s) remaining.
+                        </div>
+                    ` : '')}
+
+                    <div class="flex space-x-2 mt-4 pt-3 border-t border-slate-800">
+                        <button onclick="acceptCurrentOrder()" class="flex-1 ${(isOffline || willOverfill) ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} font-bold py-2.5 rounded-lg text-xs transition shadow-md shadow-emerald-950/40" ${(isOffline || willOverfill) ? 'disabled' : ''}>
+                            ${isOffline ? 'Offline (Cannot Accept)' : (willOverfill ? 'Bag Volume Exceeded' : 'Accept into Bag')}
+                        </button>
+                        <button onclick="declineCurrentOrder()" class="px-4 bg-slate-900 hover:bg-rose-950/80 border border-slate-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-200 font-bold py-2.5 rounded-lg text-xs transition">
+                            Decline (Pass to Next Driver)
                         </button>
                     </div>
-                `).join('');
-            }
+                </div>
+            `;
         }
+
+        renderSubTabs();
     </script>
 </body>
 </html>

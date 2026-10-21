@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Delivery - Security & Audit</title>
+    <title>Campus Delivery - Security & Audit Cockpit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,7 +12,7 @@
 </head>
 <body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- GLOBAL ROLE SWITCHER -->
+    <!-- CLEAN BRANDING HEADER -->
     <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/30">
@@ -20,15 +20,14 @@
             </div>
             <div>
                 <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
-                <p class="text-xs text-slate-400">Security & Database Audit Cockpit</p>
+                <p class="text-xs text-slate-400">Security & Database Audit Cockpit (CS G516 View Engine)</p>
             </div>
         </div>
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
-            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
-            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
-            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
-            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
-            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+
+        <div class="flex items-center space-x-3">
+            <span id="audit-health-pill" class="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> DB Integrity: NOMINAL
+            </span>
         </div>
     </header>
 
@@ -38,34 +37,90 @@
         <!-- INTEGRITY & ACTIVITY COLUMN -->
         <div class="col-span-5 space-y-6">
             
-            <!-- SYSTEM INTEGRITY AUDIT WIDGET -->
+            <!-- SYSTEM INTEGRITY AUDIT WIDGET (DYNAMIC VIEW Q3.0) -->
             <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg">
-                <h2 class="text-lg font-bold mb-4 flex items-center border-b border-slate-800 pb-3">
-                    <i class="fa-solid fa-database text-emerald-400 mr-2"></i> System Integrity Audit
-                </h2>
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-base font-bold flex items-center">
+                        <i class="fa-solid fa-database text-emerald-400 mr-2"></i> System Integrity Audit (View Q3.0)
+                    </h2>
+                    <span class="text-[10px] font-mono text-slate-500">Live Polling</span>
+                </div>
                 
                 <div class="space-y-3">
-                    <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
-                        <span class="text-sm font-bold text-slate-300">Ghost Driver Anomaly Check</span>
-                        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-mono font-bold"><i class="fa-solid fa-check mr-1"></i> PASS (0)</span>
+                    <!-- GHOST DRIVER ANOMALY ROW -->
+                    <div id="row-ghost-driver" class="bg-slate-900 p-3 rounded-lg border border-slate-800 transition">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">Ghost Driver State Check</span>
+                                <span class="text-[10px] text-slate-500 font-mono">Heartbeat &gt; 45s threshold</span>
+                            </div>
+                            <span id="badge-ghost-driver" class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
+                                <i class="fa-solid fa-check mr-1"></i> PASS (0)
+                            </span>
+                        </div>
+                        <div id="ghost-driver-detail" class="hidden mt-2 pt-2 border-t border-rose-900/40 text-[11px] font-mono text-rose-300">
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
-                        <span class="text-sm font-bold text-slate-300">Missing Order Items Check</span>
-                        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-mono font-bold"><i class="fa-solid fa-check mr-1"></i> PASS (0)</span>
+
+                    <!-- BAG CAPACITY OVERLOAD AUDIT -->
+                    <div id="row-bag-overload" class="bg-slate-900 p-3 rounded-lg border border-slate-800 transition">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">Uniform Bag Capacity Audit</span>
+                                <span class="text-[10px] text-slate-500 font-mono">Max 5 items stowed per driver run</span>
+                            </div>
+                            <span id="badge-bag-overload" class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
+                                <i class="fa-solid fa-check mr-1"></i> PASS (≤5)
+                            </span>
+                        </div>
+                        <div id="bag-overload-detail" class="hidden mt-2 pt-2 border-t border-amber-900/40 text-[11px] font-mono text-amber-300">
+                        </div>
                     </div>
+
+                    <!-- STAGING DISTRIBUTION INTEGRITY CHECK -->
                     <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
-                        <span class="text-sm font-bold text-slate-300">Spatial Geofence Drift</span>
-                        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-mono font-bold"><i class="fa-solid fa-check mr-1"></i> PASS (0)</span>
+                        <div>
+                            <span class="text-xs font-bold text-slate-200 block">Fleet Hub Staging Balance</span>
+                            <span class="text-[10px] text-slate-500 font-mono">2 drivers stationed per dining facility</span>
+                        </div>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
+                            <i class="fa-solid fa-check mr-1"></i> PASS (5/5 Hubs)
+                        </span>
+                    </div>
+
+                    <!-- MISSING ORDER ITEMS CHECK -->
+                    <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
+                        <div>
+                            <span class="text-xs font-bold text-slate-200 block">Missing Order Items (Orphan)</span>
+                            <span class="text-[10px] text-slate-500 font-mono">Foreign Key 3NF Integrity</span>
+                        </div>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
+                            <i class="fa-solid fa-check mr-1"></i> PASS (0)
+                        </span>
+                    </div>
+
+                    <!-- DROP-OFF GEOFENCE CHECK -->
+                    <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
+                        <div>
+                            <span class="text-xs font-bold text-slate-200 block">Drop-off Outside Zone Geofence</span>
+                            <span class="text-[10px] text-slate-500 font-mono">ST_Covers spatial boundary</span>
+                        </div>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
+                            <i class="fa-solid fa-check mr-1"></i> PASS (0)
+                        </span>
                     </div>
                 </div>
             </div>
 
             <!-- LIVE NETWORK TRAFFIC -->
             <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg flex-1">
-                <h2 class="text-lg font-bold mb-4 flex items-center border-b border-slate-800 pb-3">
-                    <i class="fa-solid fa-network-wired text-sky-400 mr-2"></i> Logistics Event Feed
-                </h2>
-                <div id="event-feed" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 font-mono text-xs">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-base font-bold flex items-center">
+                        <i class="fa-solid fa-network-wired text-sky-400 mr-2"></i> Live Broadcast Transaction Feed
+                    </h2>
+                    <span class="text-[10px] font-mono text-slate-500">PostGIS / PubSub</span>
+                </div>
+                <div id="event-feed" class="space-y-2 max-h-[340px] overflow-y-auto pr-2 font-mono text-[11px]">
                     <p class="text-slate-500 italic">Listening for BroadcastChannel events...</p>
                 </div>
             </div>
@@ -74,39 +129,28 @@
         <!-- PERIMETER BREACH ALARM COLUMN -->
         <div class="col-span-7 space-y-6">
             
-            <div class="bg-slate-900 border border-rose-900/50 rounded-xl p-6 shadow-[0_0_20px_rgba(225,29,72,0.1)] h-full flex flex-col">
-                <div class="flex justify-between items-start border-b border-rose-900/50 pb-4 mb-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl h-full flex flex-col" id="breach-panel">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-4 mb-4">
                     <div>
-                        <h2 class="text-xl font-bold text-rose-500 flex items-center">
-                            <i class="fa-solid fa-triangle-exclamation animate-pulse mr-2"></i> PostGIS Security Breach Log
-                        </h2>
-                        <p class="text-xs text-rose-400/70 mt-1">Monitoring RESTRICTED_INTERIOR polygons via AFTER INSERT spatial triggers.</p>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-lg font-bold text-slate-200 flex items-center" id="breach-title">
+                                <i class="fa-solid fa-shield-check text-emerald-400 mr-2" id="breach-icon"></i> PostGIS Security Breach &amp; Anomaly Log
+                            </h2>
+                            <span id="breach-counter" class="bg-slate-800 text-slate-400 text-[10px] font-mono px-2 py-0.5 rounded">0 Detected</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Monitoring RESTRICTED_INTERIOR polygons via AFTER INSERT spatial triggers on table <span class="font-mono text-white">location_trace</span></p>
                     </div>
-                    <button onclick="simulateBreach()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/50 px-3 py-1.5 rounded text-xs font-bold transition">
-                        Simulate Rogue Telemetry
-                    </button>
                 </div>
 
+                <!-- BREACH LIST -->
                 <div id="breach-log" class="space-y-3 flex-1 overflow-y-auto pr-2">
-                    
-                    <!-- Pre-seeded Breach from 02_seed.sql -->
-                    <div class="bg-rose-950/30 border-l-4 border-l-rose-500 border-y border-r border-y-rose-900/30 border-r-rose-900/30 p-4 rounded-r-lg">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-white text-sm">UNAUTHORIZED ENTRY: Director Estate Garden & Residence</h3>
-                            <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-1 rounded">LOG ID: #001</span>
+                    <div id="empty-breach-state" class="flex flex-col items-center justify-center py-16 text-center">
+                        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3 text-slate-500">
+                            <i class="fa-solid fa-circle-check text-xl text-emerald-500/70"></i>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mt-3">
-                            <div>
-                                <p class="text-[10px] text-rose-400 font-bold uppercase mb-1">Entity</p>
-                                <p class="text-sm font-mono text-slate-200">Driver Suresh (ID: 2)</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-rose-400 font-bold uppercase mb-1">Rogue Coordinate (ST_Point)</p>
-                                <p class="text-xs font-mono text-slate-300">78.5385, 17.5285 (EPSG:4326)</p>
-                            </div>
-                        </div>
+                        <p class="text-xs font-bold text-slate-300">All Authorized Corridors Intact</p>
+                        <p class="text-[11px] text-slate-500 mt-1 max-w-sm">No drivers have penetrated restricted residential interiors, exceeded 5-item bag capacity, or suffered telemetry timeouts.</p>
                     </div>
-
                 </div>
             </div>
 
@@ -116,15 +160,15 @@
 
     <script>
         const channel = new BroadcastChannel('campus_delivery');
-        let logCounter = 2;
+        let logCounter = 1;
+        let breachCount = 0;
+        let activeAnomalies = 0;
 
-        // Listen for all network events to populate the Activity Feed
         channel.onmessage = (event) => {
             const data = event.data;
             const feed = document.getElementById('event-feed');
             const time = new Date().toLocaleTimeString();
             
-            // Remove placeholder if present
             if(feed.innerHTML.includes('Listening for BroadcastChannel')) {
                 feed.innerHTML = '';
             }
@@ -132,45 +176,153 @@
             let logEntry = '';
 
             if (data.type === 'NEW_ORDER') {
-                logEntry = `<div class="text-sky-400"><span class="text-slate-500">[${time}]</span> <span class="font-bold">INSERT</span> into "order": ${data.payload.id} from ${data.payload.customer}</div>`;
+                logEntry = `<div class="text-sky-400"><span class="text-slate-500">[${time}]</span> <span class="font-bold">INSERT</span> "order": ${data.payload.id} | ${data.payload.itemCount || 1} items (${data.payload.destination})</div>`;
             } 
             else if (data.type === 'STATUS_UPDATE') {
                 let color = 'text-slate-300';
                 if(data.payload.status === 'PREPARING') color = 'text-orange-400';
-                if(data.payload.status === 'IN_TRANSIT') color = 'text-purple-400';
+                if(data.payload.status === 'READY') color = 'text-yellow-400';
+                if(data.payload.status === 'IN_TRANSIT') {
+                    color = 'text-purple-400';
+                    const spilloverTag = data.payload.isSpillover ? '<span class="text-yellow-400 font-bold">[SPILLOVER]</span> ' : '<span class="text-emerald-400">[LOCAL]</span> ';
+                    logEntry = `<div class="${color}"><span class="text-slate-500">[${time}]</span> <span class="font-bold">DISPATCH</span> ${spilloverTag}${data.payload.driver} stowed #${data.payload.orderId} (${data.payload.itemCount || 1} items in bag)</div>`;
+                }
                 if(data.payload.status === 'DELIVERED') color = 'text-emerald-400';
                 if(data.payload.status === 'CANCELLED') color = 'text-rose-400';
                 
-                logEntry = `<div class="${color}"><span class="text-slate-500">[${time}]</span> <span class="font-bold">UPDATE</span> "order" SET status='${data.payload.status}' WHERE id='${data.payload.orderId}'</div>`;
+                if (!logEntry) {
+                    logEntry = `<div class="${color}"><span class="text-slate-500">[${time}]</span> <span class="font-bold">UPDATE</span> "order" SET status='${data.payload.status}' WHERE id='${data.payload.orderId}'</div>`;
+                }
+            }
+            else if (data.type === 'DRIVER_STATUS_CHANGED') {
+                const statusTag = data.payload.online ? '<span class="text-emerald-400 font-bold">ONLINE</span>' : '<span class="text-rose-400 font-bold">OFFLINE</span>';
+                logEntry = `<div class="text-indigo-300"><span class="text-slate-500">[${time}]</span> <span class="font-bold">FLEET SHIFT</span> ${data.payload.driverName} switched to ${statusTag} (Bag: ${data.payload.currentBagLoad}/5)</div>`;
+            }
+            else if (data.type === 'SPATIAL_BREACH') {
+                insertBreachUI(data.payload.zone, data.payload.driver, data.payload.coord, data.payload.orderId);
+                logEntry = `<div class="text-rose-400 font-bold"><span class="text-slate-500">[${time}]</span> <span class="bg-rose-900/60 text-white px-1 rounded">SPATIAL TRIGGER</span> ${data.payload.zone} entered by ${data.payload.driver}</div>`;
+            }
+            else if (data.type === 'TELEMETRY_ANOMALY') {
+                handleTelemetryAnomaly(data.payload);
+                logEntry = `<div class="text-rose-500 font-bold animate-pulse"><span class="text-slate-500">[${time}]</span> <span class="bg-rose-950 text-rose-400 border border-rose-800 px-1 rounded">VIEW Q3.0 TRIP</span> Telemetry blackout on ${data.payload.driverName} (${data.payload.driverId})</div>`;
+            }
+            else if (data.type === 'TELEMETRY_RESTORED') {
+                handleTelemetryRestored(data.payload);
+                logEntry = `<div class="text-emerald-400 font-bold"><span class="text-slate-500">[${time}]</span> <span class="bg-emerald-950 text-emerald-300 px-1 rounded">HEARTBEAT RESTORED</span> GPS ping received from ${data.payload.driverId}</div>`;
             }
 
             feed.insertAdjacentHTML('afterbegin', logEntry);
         };
 
-        // Function to visually simulate the PostGIS Spatial Trigger firing
-        function simulateBreach() {
+        function handleTelemetryAnomaly(payload) {
+            activeAnomalies++;
+            updateAuditPill(false);
+
+            const row = document.getElementById('row-ghost-driver');
+            const badge = document.getElementById('badge-ghost-driver');
+            const detail = document.getElementById('ghost-driver-detail');
+
+            row.className = 'bg-rose-950/30 p-3 rounded-lg border border-rose-500/50 transition';
+            badge.className = 'bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[11px] px-2 py-0.5 rounded font-mono font-bold animate-pulse';
+            badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> FAIL (1)`;
+
+            detail.classList.remove('hidden');
+            detail.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span>${payload.driverName} (${payload.driverId})</span>
+                    <span class="text-rose-400 font-bold">${payload.thresholdExceeded}</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5">Last observed sector: ${payload.zone}</p>
+            `;
+
+            insertBreachCard(
+                'TELEMETRY_BLACKOUT Violation',
+                `GHOST DRIVER DETECTED: ${payload.driverName}`,
+                payload.driverId,
+                'Heartbeat Timeout (>45s)',
+                payload.zone
+            );
+        }
+
+        function handleTelemetryRestored(payload) {
+            activeAnomalies = Math.max(0, activeAnomalies - 1);
+            if (activeAnomalies === 0) updateAuditPill(true);
+
+            const row = document.getElementById('row-ghost-driver');
+            const badge = document.getElementById('badge-ghost-driver');
+            const detail = document.getElementById('ghost-driver-detail');
+
+            row.className = 'bg-slate-900 p-3 rounded-lg border border-slate-800 transition';
+            badge.className = 'bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold';
+            badge.innerHTML = `<i class="fa-solid fa-check mr-1"></i> PASS (0)`;
+            detail.classList.add('hidden');
+        }
+
+        function updateAuditPill(isNominal) {
+            const pill = document.getElementById('audit-health-pill');
+            if (isNominal) {
+                pill.className = 'text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold flex items-center';
+                pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> DB Integrity: NOMINAL`;
+            } else {
+                pill.className = 'text-xs font-mono px-3 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/40 rounded-full font-bold flex items-center animate-pulse';
+                pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400 mr-2"></span> DB Integrity: ANOMALY ACTIVE`;
+            }
+        }
+
+        function insertBreachUI(zone, driver, coord, orderId) {
+            insertBreachCard(
+                'RESTRICTED_INTERIOR Violation',
+                `UNAUTHORIZED ENTRY: ${zone}`,
+                driver,
+                orderId || 'Active Run',
+                coord
+            );
+        }
+
+        function insertBreachCard(badgeText, titleText, entity, associatedRef, locationText) {
             const log = document.getElementById('breach-log');
-            
-            const newBreach = `
-                <div class="bg-rose-950/30 border-l-4 border-l-rose-500 border-y border-r border-y-rose-900/30 border-r-rose-900/30 p-4 rounded-r-lg mt-3 transform transition-all duration-300 animate-pulse">
+            const emptyState = document.getElementById('empty-breach-state');
+            if (emptyState) emptyState.remove();
+
+            breachCount++;
+            const counterEl = document.getElementById('breach-counter');
+            counterEl.innerText = `${breachCount} Triggered`;
+            counterEl.className = 'bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] font-mono px-2 py-0.5 rounded font-bold';
+
+            const titleEl = document.getElementById('breach-title');
+            titleEl.className = 'text-lg font-bold text-rose-500 flex items-center';
+            const iconEl = document.getElementById('breach-icon');
+            iconEl.className = 'fa-solid fa-triangle-exclamation text-rose-500 mr-2 animate-pulse';
+
+            const panel = document.getElementById('breach-panel');
+            panel.className = 'bg-slate-900 border border-rose-900/60 rounded-xl p-6 shadow-[0_0_25px_rgba(225,29,72,0.15)] h-full flex flex-col transition-all';
+
+            const newCard = `
+                <div class="bg-rose-950/30 border-l-4 border-l-rose-500 border-y border-r border-y-rose-900/30 border-r-rose-900/30 p-4 rounded-r-lg mt-2">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-white text-sm">UNAUTHORIZED ENTRY: Faculty Flat C Building</h3>
-                        <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-1 rounded">LOG ID: #00${logCounter++}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mt-3">
                         <div>
-                            <p class="text-[10px] text-rose-400 font-bold uppercase mb-1">Entity</p>
-                            <p class="text-sm font-mono text-slate-200">Driver Ramesh (ID: 1)</p>
+                            <span class="bg-rose-500/20 text-rose-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase font-mono tracking-wider">${badgeText}</span>
+                            <h3 class="font-bold text-white text-xs mt-1.5">${titleText}</h3>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">AUDIT #${String(logCounter++).padStart(3, '0')}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mt-3 text-xs pt-2 border-t border-rose-900/30">
+                        <div>
+                            <p class="text-[10px] text-rose-400 font-bold uppercase">Workforce Unit</p>
+                            <p class="text-xs font-mono text-slate-200 mt-0.5">${entity}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-rose-400 font-bold uppercase mb-1">Rogue Coordinate (ST_Point)</p>
-                            <p class="text-xs font-mono text-slate-300">78.5415, 17.5265 (EPSG:4326)</p>
+                            <p class="text-[10px] text-rose-400 font-bold uppercase">Associated Reference</p>
+                            <p class="text-xs font-mono text-sky-400 mt-0.5">${associatedRef}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-rose-400 font-bold uppercase">Spatial / Telemetry Node</p>
+                            <p class="text-[11px] font-mono text-slate-300 mt-0.5">${locationText}</p>
                         </div>
                     </div>
                 </div>
             `;
-            
-            log.insertAdjacentHTML('afterbegin', newBreach);
+            log.insertAdjacentHTML('afterbegin', newCard);
         }
     </script>
 </body>

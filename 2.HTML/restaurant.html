@@ -12,7 +12,7 @@
 </head>
 <body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- GLOBAL ROLE SWITCHER -->
+    <!-- CLEAN BRANDING HEADER -->
     <header class="bg-cardbg border-b border-bordercolor px-6 py-3 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-orange-500/20 text-orange-400 rounded-lg border border-orange-500/30">
@@ -20,52 +20,98 @@
             </div>
             <div>
                 <h1 class="text-base font-bold text-white tracking-wide">Campus Eats</h1>
-                <p class="text-xs text-slate-400">Kitchen Operations Terminal (KOT)</p>
+                <p class="text-xs text-slate-400">Kitchen Operations Terminal (KOT) & Line Congestion Monitor</p>
             </div>
         </div>
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
-            <a href="customer.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-user mr-2"></i> Student</a>
-            <a href="restaurant.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-orange-600 text-white transition flex items-center"><i class="fa-solid fa-fire-burner mr-2"></i> KOT Hub</a>
-            <a href="driver.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-motorcycle mr-2"></i> Driver</a>
-            <a href="security.html" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-shield-halved mr-2"></i> Security</a>
-            <a href="index2.html" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition flex items-center"><i class="fa-solid fa-database mr-2"></i> DB State</a>
+
+        <!-- SIMULATION CONTROLS -->
+        <div class="flex items-center space-x-4">
+            <button id="rush-toggle-btn" onclick="toggleRushSimulation()" class="px-3.5 py-1.5 bg-slate-900 border border-slate-700 hover:border-orange-500 text-slate-300 hover:text-orange-400 text-xs font-bold rounded-lg transition flex items-center space-x-2">
+                <i class="fa-solid fa-temperature-arrow-up" id="rush-icon"></i>
+                <span id="rush-lbl">Simulate Equipment Fault / Peak Rush</span>
+            </button>
+
+            <span id="kitchen-status-pill" class="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span> Line Status: Normal
+            </span>
         </div>
     </header>
 
     <!-- KITCHEN WORKSPACE -->
     <main class="flex-1 flex flex-col">
         
-        <!-- RESTAURANT SUB-TABS -->
-        <div class="bg-cardbg border-b border-bordercolor px-8 py-4 flex space-x-2 overflow-x-auto">
-            <button onclick="switchRestaurant('Main Canteen (Academic Canteen)')" id="tab-Main Canteen (Academic Canteen)" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition">Main Canteen</button>
-            <button onclick="switchRestaurant('SAC Canteen')" id="tab-SAC Canteen" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">SAC Canteen</button>
-            <button onclick="switchRestaurant('Yummpys')" id="tab-Yummpys" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Yummpys</button>
-            <button onclick="switchRestaurant('Central Library Cafe')" id="tab-Central Library Cafe" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Library Cafe</button>
-            <button onclick="switchRestaurant('Hostel Circle Late-Night Hub')" id="tab-Hostel Circle Late-Night Hub" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Hostel Night Hub</button>
+        <!-- RESTAURANT SUB-TABS (CANTEEN SELECTOR) -->
+        <div class="bg-cardbg border-b border-bordercolor px-8 py-3.5 flex justify-between items-center overflow-x-auto">
+            <div class="flex space-x-2">
+                <button onclick="switchRestaurant('Main Canteen (Academic Canteen)')" id="tab-Main Canteen (Academic Canteen)" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition">Main Canteen</button>
+                <button onclick="switchRestaurant('SAC Canteen')" id="tab-SAC Canteen" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">SAC Canteen</button>
+                <button onclick="switchRestaurant('Yummpys')" id="tab-Yummpys" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Yummpys</button>
+                <button onclick="switchRestaurant('Central Library Cafe')" id="tab-Central Library Cafe" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Library Cafe</button>
+                <button onclick="switchRestaurant('Hostel Circle Late-Night Hub')" id="tab-Hostel Circle Late-Night Hub" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition">Hostel Night Hub</button>
+            </div>
+
+            <!-- PHYSICAL STOVE/FRYER WORKSTATION LOAD (10 SLOTS) -->
+            <div class="flex items-center space-x-4 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 block uppercase font-mono font-bold">Stove / Fryer Unit Capacity</span>
+                    <span id="workstation-text" class="text-xs font-bold text-orange-400 font-mono">0 / 10 Line Slots Active (0%)</span>
+                </div>
+                <div class="w-32 bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                    <div id="workstation-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEDICATED STAGING DRIVER BANNER -->
+        <div class="bg-slate-950 border-b border-bordercolor px-8 py-2 flex justify-between items-center text-xs">
+            <div class="flex items-center space-x-3">
+                <span class="font-bold text-slate-400 font-mono uppercase text-[11px] flex items-center">
+                    <i class="fa-solid fa-motorcycle text-indigo-400 mr-1.5"></i> Staged Fleet (2 Dedicated Units):
+                </span>
+                <div id="staged-drivers-container" class="flex space-x-2"></div>
+            </div>
+
+            <div id="staging-alert-badge" class="hidden text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-bold">
+                <i class="fa-solid fa-arrow-right-arrow-left mr-1"></i> Local Fleet Starved / Bags Full -> Spillover Active
+            </div>
+        </div>
+
+        <!-- RUSH HOUR ALERT BANNER -->
+        <div id="surge-alert-banner" class="hidden bg-orange-950/60 border-b border-orange-500/50 px-8 py-2.5 flex items-center justify-between text-xs text-orange-300">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-triangle-exclamation text-orange-400 animate-pulse text-sm"></i>
+                <span class="font-bold uppercase tracking-wide">Congestion Surge Active:</span>
+                <span>Workstation threshold reached. Dynamic +15m safety buffer added to customer ETAs.</span>
+            </div>
+            <span class="font-mono text-[10px] bg-orange-500/20 px-2 py-0.5 rounded border border-orange-500/40">FIFO BACKLOG TRIGGERED</span>
         </div>
 
         <!-- ORDER BOARDS -->
-        <div class="flex-1 p-8 grid grid-cols-2 gap-8">
+        <div class="flex-1 p-8 grid grid-cols-2 gap-8 max-w-7xl mx-auto w-full">
             
-            <!-- INCOMING PENDING QUEUE -->
+            <!-- INCOMING PENDING QUEUE (STRICT FIFO) -->
             <div class="flex flex-col space-y-4">
                 <div class="flex justify-between items-center border-b border-bordercolor pb-2">
-                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-bell text-rose-400 mr-2"></i> Incoming Orders (PENDING)</h2>
-                    <span id="pending-count" class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded font-bold text-xs">0</span>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-bell text-rose-400 mr-2"></i> Incoming Orders (Strict FIFO Queue)
+                    </h2>
+                    <span id="pending-count" class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded font-bold text-xs font-mono">0</span>
                 </div>
-                <div id="pending-queue" class="space-y-4 overflow-y-auto max-h-[600px] pr-2">
+                <div id="pending-queue" class="space-y-4 overflow-y-auto max-h-[620px] pr-2">
                     <p class="text-xs text-slate-500 text-center mt-10 italic">No incoming orders for this kitchen.</p>
                 </div>
             </div>
 
-            <!-- ACTIVE PREPARING QUEUE -->
+            <!-- ACTIVE PREPARING & READY QUEUE -->
             <div class="flex flex-col space-y-4">
                 <div class="flex justify-between items-center border-b border-bordercolor pb-2">
-                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-fire text-orange-400 mr-2"></i> Active Kitchen (PREPARING)</h2>
-                    <span id="preparing-count" class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded font-bold text-xs">0</span>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-fire text-orange-400 mr-2"></i> Active Stoves &amp; Handover Counter
+                    </h2>
+                    <span id="preparing-count" class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded font-bold text-xs font-mono">0</span>
                 </div>
-                <div id="preparing-queue" class="space-y-4 overflow-y-auto max-h-[600px] pr-2">
-                    <p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently preparing.</p>
+                <div id="preparing-queue" class="space-y-4 overflow-y-auto max-h-[620px] pr-2">
+                    <p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently on line stoves.</p>
                 </div>
             </div>
 
@@ -75,7 +121,30 @@
     <script>
         const channel = new BroadcastChannel('campus_delivery');
         
-        // Multi-tenant isolation: Store orders by restaurant name
+        // Fleet state synchronized via bag loads and online status
+        const stagedHubDrivers = {
+            'Main Canteen (Academic Canteen)': [
+                { id: 'DRV-001', name: 'Driver Ramesh', online: true, bagLoad: 0, maxBag: 5 },
+                { id: 'DRV-002', name: 'Driver Suresh', online: true, bagLoad: 0, maxBag: 5 }
+            ],
+            'SAC Canteen': [
+                { id: 'DRV-003', name: 'Driver Anita',  online: true, bagLoad: 0, maxBag: 5 },
+                { id: 'DRV-004', name: 'Driver Vikram', online: true, bagLoad: 0, maxBag: 5 }
+            ],
+            'Yummpys': [
+                { id: 'DRV-005', name: 'Driver Pooja',  online: true, bagLoad: 0, maxBag: 5 },
+                { id: 'DRV-006', name: 'Driver Karan',  online: true, bagLoad: 0, maxBag: 5 }
+            ],
+            'Central Library Cafe': [
+                { id: 'DRV-007', name: 'Driver Deepak', online: true, bagLoad: 0, maxBag: 5 },
+                { id: 'DRV-008', name: 'Driver Sneha',  online: true, bagLoad: 0, maxBag: 5 }
+            ],
+            'Hostel Circle Late-Night Hub': [
+                { id: 'DRV-009', name: 'Driver Farhan', online: true, bagLoad: 0, maxBag: 5 },
+                { id: 'DRV-010', name: 'Driver Imran',  online: false, bagLoad: 0, maxBag: 5 }
+            ]
+        };
+
         let restaurantOrders = {
             'Main Canteen (Academic Canteen)': [],
             'SAC Canteen': [],
@@ -85,61 +154,213 @@
         };
         
         let activeRestaurant = 'Main Canteen (Academic Canteen)';
+        const MAX_COOKING_SLOTS = 10;
+        let isSurgeActive = false;
+
+        function renderStagedDriversBar() {
+            const container = document.getElementById('staged-drivers-container');
+            const alertBadge = document.getElementById('staging-alert-badge');
+            const drivers = stagedHubDrivers[activeRestaurant] || [];
+
+            let allUnavailable = true;
+
+            container.innerHTML = drivers.map(d => {
+                const isOffline = (d.online === false);
+                const isBagFull = (d.bagLoad >= d.maxBag);
+                const isUnavailable = isOffline || isBagFull;
+                if (!isUnavailable) allUnavailable = false;
+
+                let pillColor = 'border-slate-800 text-slate-300';
+                let tagColor = 'bg-slate-800 text-slate-400';
+                let label = `${d.bagLoad}/${d.maxBag} Bag`;
+
+                if (isOffline) {
+                    pillColor = 'border-slate-800 text-slate-500 opacity-60';
+                    tagColor = 'bg-slate-800 text-slate-500 font-bold';
+                    label = 'OFFLINE';
+                } else if (isBagFull) {
+                    pillColor = 'border-amber-500/40 text-amber-300';
+                    tagColor = 'bg-amber-500/20 text-amber-400 font-bold';
+                    label = 'BAG FULL';
+                }
+
+                return `
+                    <div class="flex items-center space-x-1.5 bg-slate-900 border ${pillColor} px-2.5 py-1 rounded-md text-[11px] font-mono">
+                        <span class="font-bold text-white">${d.name}</span>
+                        <span class="text-[9px] px-1 py-0.2 rounded ${tagColor}">
+                            ${label}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            if (allUnavailable) {
+                alertBadge.classList.remove('hidden');
+            } else {
+                alertBadge.classList.add('hidden');
+            }
+        }
 
         function switchRestaurant(name) {
             activeRestaurant = name;
             
-            // UI Tab Switching logic
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition';
+                btn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition';
             });
             const activeBtn = document.getElementById('tab-' + name);
             if(activeBtn) {
-                activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition';
+                activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-orange-600/20 text-orange-400 border border-orange-500/50 transition';
             }
             
+            renderStagedDriversBar();
             renderOrders();
         }
 
-        // Listen for incoming orders from the Student Portal
+        function toggleRushSimulation() {
+            isSurgeActive = !isSurgeActive;
+            const btn = document.getElementById('rush-toggle-btn');
+            const icon = document.getElementById('rush-icon');
+            const lbl = document.getElementById('rush-lbl');
+            const pill = document.getElementById('kitchen-status-pill');
+            const banner = document.getElementById('surge-alert-banner');
+
+            if (isSurgeActive) {
+                btn.className = 'px-3.5 py-1.5 bg-orange-600 text-white border border-orange-500 text-xs font-bold rounded-lg transition flex items-center space-x-2 animate-pulse';
+                icon.className = 'fa-solid fa-triangle-exclamation';
+                lbl.innerText = 'Surge Active: Fryer Bottleneck (+15m)';
+                pill.className = 'text-xs font-mono px-3 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/40 rounded-full font-bold flex items-center animate-pulse';
+                pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-orange-400 mr-2"></span> Line Status: CONGESTION BACKLOG`;
+                banner.classList.remove('hidden');
+
+                channel.postMessage({
+                    type: 'KITCHEN_DELAY_SURGE',
+                    payload: {
+                        restaurant: activeRestaurant,
+                        additionalDelayMin: 15,
+                        reason: 'Equipment Bottleneck / Order Backlog Peak'
+                    }
+                });
+            } else {
+                btn.className = 'px-3.5 py-1.5 bg-slate-900 border border-slate-700 hover:border-orange-500 text-slate-300 hover:text-orange-400 text-xs font-bold rounded-lg transition flex items-center space-x-2';
+                icon.className = 'fa-solid fa-temperature-arrow-up';
+                lbl.innerText = 'Simulate Equipment Fault / Peak Rush';
+                pill.className = 'text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold flex items-center';
+                pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span> Line Status: Normal`;
+                banner.classList.add('hidden');
+
+                channel.postMessage({
+                    type: 'KITCHEN_DELAY_RESTORED',
+                    payload: { restaurant: activeRestaurant }
+                });
+            }
+
+            renderOrders();
+        }
+
         channel.onmessage = (event) => {
             const data = event.data;
             if (data.type === 'NEW_ORDER') {
-                // Route to the correct restaurant's isolated queue
                 if (restaurantOrders[data.payload.restaurant]) {
                     restaurantOrders[data.payload.restaurant].push({
                         ...data.payload,
+                        itemCount: data.payload.itemCount || 1,
                         status: 'PENDING',
-                        timestamp: new Date().toLocaleTimeString()
+                        isReady: false,
+                        assignedDriver: null,
+                        driverHub: null,
+                        isSpillover: false,
+                        bonusPaid: 0,
+                        stoveUnits: data.payload.totalStoveUnits || 2,
+                        timestamp: new Date().toLocaleTimeString(),
+                        rawTimestamp: Date.now()
                     });
                     
-                    // Only re-render if we are currently viewing the restaurant that got the order
                     if(activeRestaurant === data.payload.restaurant) {
                         renderOrders();
                     }
                 }
             }
-            // If Driver picks it up, remove from Kitchen board
-            if (data.type === 'STATUS_UPDATE' && data.payload.status === 'IN_TRANSIT') {
-                 const orders = restaurantOrders[activeRestaurant];
-                 const index = orders.findIndex(o => o.id === data.payload.orderId);
-                 if(index > -1) {
-                     orders.splice(index, 1);
-                     renderOrders();
-                 }
+            else if (data.type === 'STATUS_UPDATE') {
+                const orders = restaurantOrders[activeRestaurant];
+                const order = orders.find(o => o.id === data.payload.orderId);
+                
+                if (order && data.payload.status === 'IN_TRANSIT') {
+                    order.status = 'IN_TRANSIT';
+                    order.assignedDriver = data.payload.driver;
+                    order.driverHub = data.payload.driverHub;
+                    order.isSpillover = data.payload.isSpillover;
+                    order.bonusPaid = data.payload.bonusPaidByKitchen || 0;
+                    renderOrders();
+                    
+                    setTimeout(() => {
+                        const idx = orders.findIndex(o => o.id === data.payload.orderId);
+                        if(idx > -1) {
+                            orders.splice(idx, 1);
+                            renderOrders();
+                        }
+                    }, 2500);
+                }
+                else if (order && data.payload.status === 'DELIVERED') {
+                    const idx = orders.findIndex(o => o.id === data.payload.orderId);
+                    if(idx > -1) {
+                        orders.splice(idx, 1);
+                        renderOrders();
+                    }
+                }
+            }
+            else if (data.type === 'DRIVER_STATUS_CHANGED') {
+                for (const rest in stagedHubDrivers) {
+                    const d = stagedHubDrivers[rest].find(drv => drv.id === data.payload.driverId);
+                    if (d) {
+                        d.online = data.payload.online;
+                        d.bagLoad = data.payload.currentBagLoad;
+                    }
+                }
+                renderStagedDriversBar();
+            }
+            else if (data.type === 'ALL_DRIVERS_DECLINED') {
+                const orders = restaurantOrders[data.payload.restaurant];
+                if (orders) {
+                    const order = orders.find(o => o.id === data.payload.orderId);
+                    if (order) {
+                        order.noDrivers = true;
+                        renderOrders();
+                    }
+                }
+            }
+            else if (data.type === 'CUSTOMER_FALLBACK_CHOICE') {
+                const orders = restaurantOrders[data.payload.restaurant];
+                if (orders) {
+                    const order = orders.find(o => o.id === data.payload.orderId);
+                    if (order) {
+                        if (data.payload.choice === 'PICKUP') {
+                            order.selfPickupConfirmed = true;
+                        } else {
+                            order.cancelledNoPickup = true;
+                        }
+                        renderOrders();
+                    }
+                }
             }
         };
 
         function acceptOrder(orderId) {
-            const order = restaurantOrders[activeRestaurant].find(o => o.id === orderId);
+            const orders = restaurantOrders[activeRestaurant];
+            const order = orders.find(o => o.id === orderId);
             if(order) {
                 order.status = 'PREPARING';
+                order.isReady = false;
                 renderOrders();
                 
-                // Broadcast to Customer (Food is cooking) & Driver (Dispatch available)
                 channel.postMessage({
                     type: 'STATUS_UPDATE',
-                    payload: { orderId: orderId, status: 'PREPARING', restaurant: activeRestaurant, destination: order.destination }
+                    payload: { 
+                        orderId: orderId, 
+                        status: 'PREPARING', 
+                        restaurant: activeRestaurant, 
+                        destination: order.destination,
+                        surgeDelay: isSurgeActive ? 15 : 0
+                    }
                 });
             }
         }
@@ -149,14 +370,58 @@
             const index = orders.findIndex(o => o.id === orderId);
             
             if(index > -1) {
-                // Broadcast rejection to Customer
                 channel.postMessage({
                     type: 'STATUS_UPDATE',
-                    payload: { orderId: orderId, status: 'CANCELLED', reason: 'Kitchen Capacity/Item Unavailable' }
+                    payload: { 
+                        orderId: orderId, 
+                        status: 'CANCELLED', 
+                        restaurant: activeRestaurant,
+                        reason: 'Kitchen cooking slots saturated or ingredient unavailable' 
+                    }
                 });
-                // Remove from KOT
+                
                 orders.splice(index, 1);
                 renderOrders();
+            }
+        }
+
+        function toggleOrderReady(orderId, isReady) {
+            const order = restaurantOrders[activeRestaurant].find(o => o.id === orderId);
+            if(order) {
+                order.isReady = isReady;
+                renderOrders();
+
+                // Forward itemCount along with order status
+                channel.postMessage({
+                    type: 'STATUS_UPDATE',
+                    payload: { 
+                        orderId: orderId, 
+                        status: isReady ? 'READY' : 'PREPARING', 
+                        restaurant: activeRestaurant, 
+                        destination: order.destination,
+                        itemCount: order.itemCount || 1
+                    }
+                });
+            }
+        }
+
+        function updateWorkstationGauge(activeCookingUnits) {
+            const bar = document.getElementById('workstation-bar');
+            const lbl = document.getElementById('workstation-text');
+            const percent = Math.min(100, Math.round((activeCookingUnits / MAX_COOKING_SLOTS) * 100));
+
+            bar.style.width = `${percent}%`;
+            lbl.innerText = `${activeCookingUnits} / ${MAX_COOKING_SLOTS} Line Slots Active (${percent}%)`;
+
+            if (activeCookingUnits >= MAX_COOKING_SLOTS) {
+                bar.className = 'bg-rose-500 h-full transition-all duration-300';
+                lbl.className = 'text-xs font-bold text-rose-400 font-mono animate-pulse';
+            } else if (activeCookingUnits >= 7) {
+                bar.className = 'bg-amber-500 h-full transition-all duration-300';
+                lbl.className = 'text-xs font-bold text-amber-400 font-mono';
+            } else {
+                bar.className = 'bg-emerald-500 h-full transition-all duration-300';
+                lbl.className = 'text-xs font-bold text-emerald-400 font-mono';
             }
         }
 
@@ -165,59 +430,157 @@
             const preparingQueue = document.getElementById('preparing-queue');
             
             const orders = restaurantOrders[activeRestaurant];
-            const pendingOrders = orders.filter(o => o.status === 'PENDING');
-            const preparingOrders = orders.filter(o => o.status === 'PREPARING');
+
+            const pendingOrders = orders
+                .filter(o => o.status === 'PENDING')
+                .sort((a, b) => a.rawTimestamp - b.rawTimestamp);
+
+            const activeOrders = orders.filter(o => o.status === 'PREPARING' || o.status === 'IN_TRANSIT');
+
+            const activeCookingUnits = activeOrders
+                .filter(o => o.status === 'PREPARING')
+                .reduce((sum, o) => sum + (o.stoveUnits || 2), 0);
 
             document.getElementById('pending-count').innerText = pendingOrders.length;
-            document.getElementById('preparing-count').innerText = preparingOrders.length;
+            document.getElementById('preparing-count').innerText = activeOrders.length;
 
-            // Render PENDING
+            updateWorkstationGauge(activeCookingUnits);
+
             if (pendingOrders.length === 0) {
-                pendingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No incoming orders.</p>`;
+                pendingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No incoming orders for this kitchen.</p>`;
             } else {
-                pendingQueue.innerHTML = pendingOrders.map(order => `
-                    <div class="bg-cardbg border border-rose-500/30 rounded-xl p-4 shadow-lg">
-                        <div class="flex justify-between items-start mb-3 border-b border-slate-800 pb-2">
+                const isLineFull = activeCookingUnits >= MAX_COOKING_SLOTS;
+
+                pendingQueue.innerHTML = pendingOrders.map((order, idx) => `
+                    <div class="bg-cardbg border ${isLineFull ? 'border-amber-500/50' : 'border-rose-500/30'} rounded-xl p-4 shadow-lg space-y-3">
+                        <div class="flex justify-between items-start border-b border-slate-800 pb-2">
                             <div>
-                                <h3 class="font-bold text-white">${order.id}</h3>
-                                <p class="text-xs text-slate-400">Customer: ${order.customer}</p>
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="font-bold text-white text-sm">${order.id}</h3>
+                                    <span class="bg-slate-800 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">
+                                        FIFO QUEUE #${idx + 1}
+                                    </span>
+                                    <span class="bg-amber-500/10 text-amber-300 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">
+                                        ${order.stoveUnits || 2} Slots Needed
+                                    </span>
+                                    <span class="bg-indigo-500/10 text-indigo-300 text-[9px] font-mono px-1.5 py-0.5 rounded font-bold">
+                                        ${order.itemCount || 1} Bag Items
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">Role: <span class="text-slate-200 font-bold">${order.customer} (${order.role || 'STUDENT'})</span></p>
                             </div>
                             <div class="text-right">
-                                <span class="font-mono text-emerald-400 font-bold block">₹${order.total}</span>
-                                <span class="text-[10px] text-slate-500">${order.timestamp}</span>
+                                <span class="font-mono text-emerald-400 font-bold text-sm block">₹${order.total}</span>
+                                <span class="text-[10px] text-slate-500 font-mono">${order.timestamp}</span>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <!-- Dynamic Cart Items mapped from payload -->
-                            <p class="text-sm text-slate-300"><i class="fa-solid fa-utensils text-slate-500 mr-2"></i> ${order.itemsDescription || '1x Customer Cart Selection'}</p>
-                            ${order.isSurge ? '<span class="inline-block mt-2 bg-purple-500/20 text-purple-400 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30">LATE-NIGHT SURGE APPLIED</span>' : ''}
+
+                        ${isLineFull ? `
+                            <div class="p-2 bg-amber-950/40 border border-amber-500/30 rounded text-[11px] text-amber-300 font-mono flex items-center space-x-1.5">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                                <span>Cooking Slots Full (10/10). Buffered in strict FIFO sequence.</span>
+                            </div>
+                        ` : ''}
+
+                        <div>
+                            <p class="text-xs text-slate-300"><i class="fa-solid fa-utensils text-slate-500 mr-2"></i> ${order.itemsDescription || '1x Order Selection'}</p>
+                            <p class="text-xs text-sky-400 mt-1.5"><i class="fa-solid fa-location-dot text-slate-500 mr-2"></i> ${order.destination}</p>
                         </div>
-                        <div class="flex space-x-2">
-                            <button onclick="acceptOrder('${order.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded transition"><i class="fa-solid fa-check mr-1"></i> Accept</button>
-                            <button onclick="rejectOrder('${order.id}')" class="bg-rose-900/50 hover:bg-rose-600 border border-rose-500/30 text-rose-200 hover:text-white text-xs font-bold px-4 py-2 rounded transition"><i class="fa-solid fa-xmark"></i></button>
+
+                        <div class="flex space-x-2 pt-1">
+                            <button onclick="acceptOrder('${order.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded transition flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-check"></i>
+                                <span>${isLineFull ? 'Accept into Buffer Queue' : 'Accept onto Stove Slots'}</span>
+                            </button>
+                            <button onclick="rejectOrder('${order.id}')" class="bg-rose-900/50 hover:bg-rose-600 border border-rose-500/30 text-rose-200 hover:text-white text-xs font-bold px-4 py-2 rounded transition">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                     </div>
                 `).join('');
             }
 
-            // Render PREPARING
-            if (preparingOrders.length === 0) {
-                preparingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently preparing.</p>`;
+            if (activeOrders.length === 0) {
+                preparingQueue.innerHTML = `<p class="text-xs text-slate-500 text-center mt-10 italic">No orders currently on line stoves.</p>`;
             } else {
-                preparingQueue.innerHTML = preparingOrders.map(order => `
-                    <div class="bg-slate-900 border border-orange-500/30 rounded-xl p-4 shadow-lg border-l-4 border-l-orange-500">
+                preparingQueue.innerHTML = activeOrders.map(order => `
+                    <div class="bg-slate-900 border ${
+                        order.selfPickupConfirmed 
+                            ? 'border-yellow-400 border-l-yellow-400' 
+                            : (order.isReady ? 'border-yellow-500/40 border-l-yellow-500' : 'border-orange-500/30 border-l-orange-500')
+                    } rounded-xl p-4 shadow-lg border-l-4">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h3 class="font-bold text-white">${order.id}</h3>
-                                <p class="text-xs text-slate-400">Drop-off: <span class="text-sky-400 font-bold">${order.destination}</span></p>
+                                <h3 class="font-bold text-white text-sm">${order.id}</h3>
+                                <p class="text-xs text-slate-400">Target Drop: <span class="text-sky-400 font-bold">${order.destination}</span></p>
                             </div>
-                            <span class="bg-orange-500/20 text-orange-400 text-[10px] px-2 py-1 rounded font-bold animate-pulse">COOKING</span>
+                            <div class="text-right">
+                                <span class="${
+                                    order.selfPickupConfirmed
+                                        ? 'bg-yellow-400/20 text-yellow-300'
+                                        : (order.isReady ? 'bg-yellow-500/20 text-yellow-400' : 'bg-orange-500/20 text-orange-400')
+                                } text-[10px] px-2 py-0.5 rounded font-bold font-mono">
+                                    ${order.selfPickupConfirmed ? 'DINE-IN / SELF-PICKUP' : (order.isReady ? 'READY (ROUTING FLEET)' : 'STOVE ACTIVE')}
+                                </span>
+                                <span class="block text-[10px] text-amber-400 font-mono mt-0.5">${order.stoveUnits || 2} cooking slots in use</span>
+                            </div>
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-2"><i class="fa-solid fa-radar mr-1"></i> Broadcasting to available drivers for pickup...</p>
+
+                        <div class="my-3 p-2.5 bg-slate-950 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-300">Food Ready for Handover?</span>
+                            <div class="flex space-x-1.5">
+                                <button onclick="toggleOrderReady('${order.id}', true)" class="px-3 py-1 rounded text-xs font-bold ${order.isReady ? 'bg-yellow-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'} transition">
+                                    YES
+                                </button>
+                                <button onclick="toggleOrderReady('${order.id}', false)" class="px-3 py-1 rounded text-xs font-bold ${!order.isReady ? 'bg-orange-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-white'} transition">
+                                    NO
+                                </button>
+                            </div>
+                        </div>
+
+                        ${order.selfPickupConfirmed ? `
+                            <div class="mt-3 p-3 bg-yellow-950/40 border border-yellow-500/60 rounded-lg text-xs space-y-1">
+                                <p class="font-bold text-yellow-300"><i class="fa-solid fa-hand-holding-dollar mr-1.5"></i> COUNTER CASHBACK ACTION REQUIRED</p>
+                                <p class="text-slate-300 text-[11px]">Customer opted for Self-Pickup. <strong>Hand over ₹15 cash refund</strong> to student upon arrival!</p>
+                            </div>
+                        ` : (order.cancelledNoPickup ? `
+                            <div class="mt-3 p-3 bg-rose-950/40 border border-rose-500/50 rounded-lg text-xs">
+                                <p class="font-bold text-rose-300"><i class="fa-solid fa-xmark mr-1.5"></i> Order Cancelled by Customer</p>
+                                <p class="text-slate-400 text-[11px]">Customer unable to self-pickup. Food cost retained by kitchen; ₹15 delivery fee refunded.</p>
+                            </div>
+                        ` : (order.noDrivers ? `
+                            <div class="mt-3 p-3 bg-rose-950/40 border border-rose-500/50 rounded-lg text-xs">
+                                <p class="font-bold text-rose-300"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> All campus fleet drivers declined.</p>
+                                <p class="text-slate-400 text-[11px] mt-0.5">Awaiting customer decision (Self-Pickup vs. Cancellation)...</p>
+                            </div>
+                        ` : (order.status === 'IN_TRANSIT' ? `
+                            <div class="mt-3 p-3 bg-indigo-950/40 border border-indigo-500/40 rounded-lg text-xs space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-slate-400 text-[10px] uppercase font-bold block">Assigned Driver</span>
+                                        <span class="text-white font-bold">${order.assignedDriver}</span>
+                                    </div>
+                                    <span class="${order.isSpillover ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'} text-[10px] font-mono px-2 py-0.5 rounded font-bold">
+                                        ${order.isSpillover ? 'CROSS-CAMPUS SPILLOVER' : 'LOCAL STAGED'}
+                                    </span>
+                                </div>
+                                ${order.bonusPaid > 0 ? `
+                                    <div class="pt-1 border-t border-indigo-900/40">
+                                        <span class="bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/40 inline-block">
+                                            -₹${order.bonusPaid} Kitchen Escalation Bonus Paid
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : `
+                            <p class="text-[10px] text-slate-500 mt-2 font-mono"><i class="fa-solid fa-satellite-dish mr-1 animate-pulse"></i> Auto-routing to local staged drivers first, then KNN spillover...</p>
+                        `)))}
                     </div>
                 `).join('');
             }
         }
+
+        renderStagedDriversBar();
     </script>
 </body>
 </html>
