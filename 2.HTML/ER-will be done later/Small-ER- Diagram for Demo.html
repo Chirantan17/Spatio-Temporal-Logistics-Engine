@@ -58,11 +58,11 @@
         td {
             border-bottom: 1px solid #0f172a;
         }
-        /* WHITEBOARD COLOR SPECIFICATIONS */
-        .pk-text { color: #facc15 !important; font-weight: 800; } /* YELLOW for PK column & values */
-        .fk-header { color: #c084fc !important; font-weight: 800; } /* PURPLE for FK column headers ONLY */
         
-        /* GREEN WRITE HIGHLIGHT ON STEP ADVANCE */
+        .pk-text { color: #facc15 !important; font-weight: 800; } 
+        .fk-header { color: #c084fc !important; font-weight: 800; } 
+        .spatial-data { color: #a3e635 !important; font-weight: 600; font-style: italic; }
+        
         .new-row-highlight {
             background-color: rgba(16, 185, 129, 0.25) !important;
             border: 1px solid #10b981 !important;
@@ -75,6 +75,12 @@
             font-weight: 800;
             border-radius: 4px;
         }
+        .cell-breach-highlight {
+            background-color: rgba(225, 29, 72, 0.35) !important;
+            color: #fda4af !important;
+            font-weight: 800;
+            border-radius: 4px;
+        }
 
         .fk-line {
             stroke: #334155;
@@ -84,6 +90,12 @@
         }
         .fk-line-active {
             stroke: #38bdf8;
+            stroke-width: 3.5;
+            stroke-dasharray: 6;
+            animation: dash 1s linear infinite;
+        }
+        .fk-line-breach {
+            stroke: #f43f5e;
             stroke-width: 3.5;
             stroke-dasharray: 6;
             animation: dash 1s linear infinite;
@@ -111,16 +123,16 @@
         <div class="flex items-center space-x-3 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
             <button id="btn-prev" onclick="changeStep(-1)" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center space-x-1.5 text-slate-200">
                 <i class="fa-solid fa-backward"></i>
-                <span>Step Back (Undo)</span>
+                <span>Step Back</span>
             </button>
             
             <div class="px-5 text-center min-w-[320px]">
                 <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Active Transaction Stage</span>
-                <span id="step-indicator" class="text-sm font-bold text-sky-400 font-mono">Step 0 / 5 — Ready to Start</span>
+                <span id="step-indicator" class="text-sm font-bold text-sky-400 font-mono">Step 0 / 6 — Ready to Start</span>
             </div>
 
             <button id="btn-next" onclick="changeStep(1)" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-xs font-semibold rounded-lg text-white shadow-md transition flex items-center space-x-1.5">
-                <span>Step Forward (Advance)</span>
+                <span>Step Forward</span>
                 <i class="fa-solid fa-forward"></i>
             </button>
 
@@ -146,31 +158,25 @@
         <!-- TAB 1: CONNECTED ER DIAGRAM -->
         <section id="tab-er" class="flex-1 flex flex-col space-y-4">
             
-            <!-- STAGE STATUS BANNER -->
             <div class="bg-cardbg border border-bordercolor rounded-xl p-3 flex justify-between items-center text-xs">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-circle-info text-sky-400"></i>
                     <span class="text-slate-300 text-xs">Execution Mechanics: <strong id="stage-summary" class="text-white font-mono text-xs">Pre-existing seeded data loaded. Click Step Forward to place new Order 12.</strong></span>
                 </div>
                 <div class="flex items-center space-x-4 text-xs font-mono">
-                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 mr-1.5"></span> PK (Yellow Text)</span>
-                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-purple-400 mr-1.5"></span> FK (Purple Header)</span>
-                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span> Green Highlight (Write/Update)</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 mr-1.5"></span> PK</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-purple-400 mr-1.5"></span> FK</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span> Update/Insert</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span> Trigger Breach</span>
                 </div>
             </div>
 
-            <!-- ER DIAGRAM CANVAS WITH DYNAMIC SVG CONNECTORS -->
-            <div class="relative flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-6 min-h-[580px] overflow-x-auto flex flex-col justify-between">
+            <div class="relative flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-6 min-h-[640px] overflow-x-auto flex flex-col justify-between">
                 
-                <!-- DYNAMIC SVG CONNECTOR LAYER -->
-                <svg id="svg-layer" class="absolute inset-0 w-full h-full pointer-events-none z-10">
-                    <!-- Dynamic connector lines and white 1:N constraint badges rendered by JS -->
-                </svg>
+                <svg id="svg-layer" class="absolute inset-0 w-full h-full pointer-events-none z-10"></svg>
 
                 <!-- ROW 1: MASTER ENTITIES -->
                 <div class="flex justify-between items-start z-20 px-4">
-                    
-                    <!-- CUSTOMER TABLE -->
                     <div id="card-customer" class="table-container">
                         <div class="table-header-title">CUSTOMER</div>
                         <table>
@@ -189,7 +195,6 @@
                         </table>
                     </div>
 
-                    <!-- RESTAURANT TABLE -->
                     <div id="card-restaurant" class="table-container">
                         <div class="table-header-title">RESTAURANT</div>
                         <table>
@@ -201,13 +206,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td class="pk-text">1</td><td>Canteen 1 (Main Hub)</td><td>(17.5215, 78.5415)</td></tr>
-                                <tr><td class="pk-text">3</td><td>Hostel 3 Mess & Cafe</td><td>(17.5225, 78.5475)</td></tr>
+                                <tr><td class="pk-text">1</td><td>Canteen 1 (Main Hub)</td><td class="spatial-data">POINT(78.5415 17.5215)</td></tr>
+                                <tr><td class="pk-text">3</td><td>Hostel 3 Mess</td><td class="spatial-data">POINT(78.5475 17.5225)</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- MENU_ITEM TABLE -->
                     <div id="card-menu_item" class="table-container">
                         <div class="table-header-title">MENU_ITEM</div>
                         <table>
@@ -216,25 +220,19 @@
                                     <th class="pk-text">item_id</th>
                                     <th class="fk-header">restaurant_id</th>
                                     <th>name</th>
-                                    <th>category</th>
                                     <th>price</th>
-                                    <th>serve_start</th>
-                                    <th>serve_end</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td class="pk-text">1</td><td>1</td><td>Veg Thali</td><td>General</td><td>120.00</td><td>06:00:00</td><td>22:00:00</td></tr>
-                                <tr><td class="pk-text">25</td><td>1</td><td>Chicken Tikka Roll</td><td>Snack</td><td>90.00</td><td>16:00:00</td><td>20:00:00</td></tr>
+                                <tr><td class="pk-text">1</td><td>1</td><td>Veg Thali</td><td>120.00</td></tr>
+                                <tr><td class="pk-text">25</td><td>1</td><td>Chicken Tikka Roll</td><td>90.00</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                 </div>
 
                 <!-- ROW 2: TRANSACTION CORE (ORDER & ORDER_ITEM) -->
                 <div class="flex justify-center items-start gap-12 z-20 my-6 px-4">
-                    
-                    <!-- ORDER TABLE -->
                     <div id="card-order" class="table-container">
                         <div class="table-header-title">ORDER</div>
                         <table>
@@ -246,41 +244,20 @@
                                     <th class="fk-header">driver_id</th>
                                     <th class="fk-header">destination_id</th>
                                     <th>status</th>
-                                    <th>delivery_fee</th>
                                     <th>created_at</th>
-                                    <th>fulfilled_at</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-order">
-                                <!-- Pre-existing rows synced with 02_seed.sql -->
                                 <tr>
-                                    <td class="pk-text">10</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>NULL</td>
-                                    <td>3</td>
-                                    <td>PENDING</td>
-                                    <td>0.00</td>
-                                    <td>14:20:00</td>
-                                    <td>NULL</td>
+                                    <td class="pk-text">10</td><td>1</td><td>1</td><td>NULL</td><td>3</td><td>PENDING</td><td>14:20:00</td>
                                 </tr>
                                 <tr>
-                                    <td class="pk-text">11</td>
-                                    <td>4</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>1</td>
-                                    <td>CANCELLED</td>
-                                    <td>0.00</td>
-                                    <td>14:00:00</td>
-                                    <td>NULL</td>
+                                    <td class="pk-text">11</td><td>4</td><td>1</td><td>3</td><td>1</td><td>CANCELLED</td><td>14:00:00</td>
                                 </tr>
-                                <!-- Dynamic Row 12 appended via JS on Step Advance -->
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- ORDER_ITEM TABLE -->
                     <div id="card-order_item" class="table-container">
                         <div class="table-header-title">ORDER_ITEM</div>
                         <table>
@@ -294,20 +271,16 @@
                                 </tr>
                             </thead>
                             <tbody id="tbody-order-item">
-                                <!-- Pre-existing rows synced with 02_seed.sql -->
                                 <tr><td>10</td><td>1</td><td>1</td><td>1</td><td>120.00</td></tr>
                                 <tr><td>11</td><td>3</td><td>1</td><td>1</td><td>90.00</td></tr>
-                                <!-- Dynamic Row 12 appended via JS on Step Advance -->
                             </tbody>
                         </table>
                     </div>
-
                 </div>
 
                 <!-- ROW 3: WORKFORCE & SPATIAL ENTITIES -->
                 <div class="flex justify-between items-start gap-6 z-20 px-2">
                     
-                    <!-- DRIVER TABLE -->
                     <div id="card-driver" class="table-container">
                         <div class="table-header-title">DRIVER</div>
                         <table>
@@ -325,7 +298,6 @@
                         </table>
                     </div>
 
-                    <!-- LOCATION_TRACE TABLE -->
                     <div id="card-location_trace" class="table-container">
                         <div class="table-header-title">LOCATION_TRACE</div>
                         <table>
@@ -338,14 +310,12 @@
                                 </tr>
                             </thead>
                             <tbody id="tbody-location-trace">
-                                <tr><td class="pk-text">999</td><td>1</td><td>(17.5212, 78.5412)</td><td>14:23:00</td></tr>
-                                <tr><td class="pk-text">1000</td><td>2</td><td>(17.5231, 78.5431)</td><td>14:24:00</td></tr>
-                                <!-- Dynamic telemetry ping appended on Step 4 -->
+                                <tr><td class="pk-text">999</td><td>1</td><td class="spatial-data">POINT(78.5412 17.5212)</td><td>14:23:00</td></tr>
+                                <tr><td class="pk-text">1000</td><td>2</td><td class="spatial-data">POINT(78.5431 17.5231)</td><td>14:24:00</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- DELIVERY_LOCATION TABLE -->
                     <div id="card-delivery_location" class="table-container">
                         <div class="table-header-title">DELIVERY_LOCATION</div>
                         <table>
@@ -357,13 +327,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td class="pk-text">1</td><td>1</td><td>(17.5210, 78.5410)</td></tr>
-                                <tr><td class="pk-text">3</td><td>2</td><td>(17.5210, 78.5460)</td></tr>
+                                <tr><td class="pk-text">1</td><td>1</td><td class="spatial-data">POINT(78.5410 17.5210)</td></tr>
+                                <tr><td class="pk-text">3</td><td>2</td><td class="spatial-data">POINT(78.5460 17.5210)</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- CAMPUS_ZONE TABLE -->
                     <div id="card-campus_zone" class="table-container">
                         <div class="table-header-title">CAMPUS_ZONE</div>
                         <table>
@@ -375,8 +344,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td class="pk-text">1</td><td>Academic Zone</td><td>POLYGON(...)</td></tr>
-                                <tr><td class="pk-text">2</td><td>Hostel Zone A</td><td>POLYGON(...)</td></tr>
+                                <tr><td class="pk-text">1</td><td>Academic Zone</td><td class="spatial-data">POLYGON(...)</td></tr>
+                                <tr><td class="pk-text">2</td><td>Hostel Zone A</td><td class="spatial-data">POLYGON(...)</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -405,59 +374,66 @@
         let currentStep = 0;
 
         const connections = [
-            { from: 'customer', to: 'order', id: 'conn-cust-order', card: '1:N' },
-            { from: 'restaurant', to: 'order', id: 'conn-rest-order', card: '1:N' },
-            { from: 'restaurant', to: 'menu_item', id: 'conn-rest-menu', card: '1:N' },
-            { from: 'order', to: 'order_item', id: 'conn-order-item', card: '1:N' },
-            { from: 'menu_item', to: 'order_item', id: 'conn-menu-orderitem', card: '1:N' },
-            { from: 'driver', to: 'order', id: 'conn-driver-order', card: '1:N' },
-            { from: 'driver', to: 'location_trace', id: 'conn-driver-trace', card: '1:N' },
-            { from: 'campus_zone', to: 'delivery_location', id: 'conn-zone-loc', card: '1:N' },
-            { from: 'delivery_location', to: 'order', id: 'conn-loc-order', card: '1:N' }
+            { from: 'customer', to: 'order', id: 'conn-cust-order', card: '1:N', triggerAt: [1,2,3,4,5] },
+            { from: 'restaurant', to: 'order', id: 'conn-rest-order', card: '1:N', triggerAt: [1,2] },
+            { from: 'restaurant', to: 'menu_item', id: 'conn-rest-menu', card: '1:N', triggerAt: [] },
+            { from: 'order', to: 'order_item', id: 'conn-order-item', card: '1:N', triggerAt: [1] },
+            { from: 'menu_item', to: 'order_item', id: 'conn-menu-orderitem', card: '1:N', triggerAt: [1] },
+            { from: 'driver', to: 'order', id: 'conn-driver-order', card: '1:N', triggerAt: [3,4,5] },
+            { from: 'driver', to: 'location_trace', id: 'conn-driver-trace', card: '1:N', triggerAt: [3,4,6] },
+            { from: 'campus_zone', to: 'delivery_location', id: 'conn-zone-loc', card: '1:N', triggerAt: [5,6] },
+            { from: 'delivery_location', to: 'order', id: 'conn-loc-order', card: '1:N', triggerAt: [5] }
         ];
 
         const steps = [
             {
                 step: 0,
-                title: "Step 0 / 5 — Ready to Start",
+                title: "Step 0 / 6 — Ready to Start",
                 stageSummary: "Pre-existing seeded data loaded. Click Step Forward to place new Order 12.",
                 activeConnectors: [],
                 sql: "-- Baseline state loaded. Pre-existing orders 1 through 11 present in database from 02_seed.sql."
             },
             {
                 step: 1,
-                title: "Step 1 / 5 — Order Creation & Table Update",
+                title: "Step 1 / 6 — Order Creation & Table Update",
                 stageSummary: "New order placed by Amit Verma (Customer 3). New rows added to ORDER and ORDER_ITEM tables.",
                 activeConnectors: ["conn-cust-order", "conn-rest-order", "conn-order-item", "conn-menu-orderitem"],
                 sql: `BEGIN TRANSACTION;\n\n-- Insert Transaction Header (Customer 3, Restaurant 1, Destination 3, NULL Driver)\nINSERT INTO "order" (order_id, customer_id, restaurant_id, driver_id, destination_id, status, delivery_fee, created_at, fulfilled_at)\nVALUES (12, 3, 1, NULL, 3, 'PENDING', 0.00, NOW(), NULL);\n\n-- Insert Line Item with Historical Price Snapshot and Composite Integrity\nINSERT INTO order_item (order_id, item_id, restaurant_id, quantity, price_at_order)\nVALUES (12, 1, 1, 2, 120.00);\n\nCOMMIT;`
             },
             {
                 step: 2,
-                title: "Step 2 / 5 — Canteen Acceptance & Preparation",
+                title: "Step 2 / 6 — Canteen Acceptance & Preparation",
                 stageSummary: "Canteen 1 accepts order. ORDER status updated to PREPARING.",
                 activeConnectors: ["conn-rest-order"],
                 sql: `UPDATE "order" \nSET status = 'PREPARING'\nWHERE order_id = 12 AND status = 'PENDING';`
             },
             {
                 step: 3,
-                title: "Step 3 / 5 — Searching for Driver & Assigning Order",
+                title: "Step 3 / 6 — Searching for Driver & Assigning Order",
                 stageSummary: "Nearest available Driver B (Suresh) assigned via PostGIS KNN (<->). ORDER updated with driver_id = 2.",
                 activeConnectors: ["conn-driver-order", "conn-driver-trace"],
                 sql: `-- PostGIS KNN Nearest Neighbor Bounding Box Operator (<->)\nSELECT d.driver_id FROM driver d JOIN location_trace lt ON d.driver_id = lt.driver_id\nJOIN restaurant r ON r.restaurant_id = 1 WHERE d.status = 'AVAILABLE'\nORDER BY lt.location <-> r.location LIMIT 1;\n\nUPDATE "order" SET driver_id = 2, status = 'IN_TRANSIT' WHERE order_id = 12;\nUPDATE driver SET status = 'BUSY' WHERE driver_id = 2;`
             },
             {
                 step: 4,
-                title: "Step 4 / 5 — Driver Telemetry & Pickup Geofence Check",
+                title: "Step 4 / 6 — Driver Telemetry & Pickup Geofence Check",
                 stageSummary: "Driver reaches Canteen 1 within 30m (ST_DWithin). Real-time GPS ping logged to LOCATION_TRACE.",
                 activeConnectors: ["conn-rest-order", "conn-driver-trace"],
                 sql: `SELECT ST_DWithin(lt.location::geography, r.location::geography, 30.0)\nFROM location_trace lt, restaurant r WHERE lt.driver_id = 2 AND r.restaurant_id = 1;\n\nINSERT INTO location_trace (trace_id, driver_id, location, recorded_at)\nVALUES (1001, 2, ST_SetSRID(ST_MakePoint(78.5415, 17.5215), 4326), NOW());`
             },
             {
                 step: 5,
-                title: "Step 5 / 5 — Order Delivered Successfully",
+                title: "Step 5 / 6 — Order Delivered Successfully",
                 stageSummary: "Order delivered inside Hostel Zone A (ST_Covers). ORDER status updated to DELIVERED.",
                 activeConnectors: ["conn-zone-loc", "conn-loc-order", "conn-driver-order"],
                 sql: `SELECT ST_Covers(cz.boundary, dl.point)\nFROM campus_zone cz JOIN delivery_location dl ON cz.zone_id = dl.zone_id\nWHERE dl.location_id = 3;\n\nUPDATE "order" SET status = 'DELIVERED', fulfilled_at = NOW() WHERE order_id = 12;\nUPDATE driver SET status = 'AVAILABLE' WHERE driver_id = 2;`
+            },
+            {
+                step: 6,
+                title: "Step 6 / 6 — Security Breach Anomaly (Driver Intrusion)",
+                stageSummary: "Driver enters restricted interior block. LOCATION_TRACE triggers AFTER INSERT SPATIAL_BREACH alarm.",
+                activeConnectors: ["conn-driver-trace", "conn-zone-loc"],
+                sql: `-- Rogue GPS ping inserted deep inside Hostel 1 Interior\nINSERT INTO location_trace (trace_id, driver_id, location, recorded_at)\nVALUES (1002, 2, ST_SetSRID(ST_MakePoint(78.5465, 17.5215), 4326), NOW());\n\n-- AFTER INSERT TRIGGER EXECUTES:\n-- INSERT INTO security_breach_log (...) VALUES (2, 'Hostel 1 Interior Block', ...)`
             }
         ];
 
@@ -475,46 +451,25 @@
             const tbodyOrder = document.getElementById('tbody-order');
             let orderHtml = `
                 <tr>
-                    <td class="pk-text">10</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>NULL</td>
-                    <td>3</td>
-                    <td>PENDING</td>
-                    <td>0.00</td>
-                    <td>14:20:00</td>
-                    <td>NULL</td>
+                    <td class="pk-text">10</td><td>1</td><td>1</td><td>NULL</td><td>3</td><td>PENDING</td><td>14:20:00</td>
                 </tr>
                 <tr>
-                    <td class="pk-text">11</td>
-                    <td>4</td>
-                    <td>1</td>
-                    <td>3</td>
-                    <td>1</td>
-                    <td>CANCELLED</td>
-                    <td>0.00</td>
-                    <td>14:00:00</td>
-                    <td>NULL</td>
+                    <td class="pk-text">11</td><td>4</td><td>1</td><td>3</td><td>1</td><td>CANCELLED</td><td>14:00:00</td>
                 </tr>
             `;
 
             if (currentStep >= 1) {
                 let driverIdVal = currentStep >= 3 ? "2" : "NULL";
                 let statusVal = "PENDING";
-                let fulfilledVal = "NULL";
 
                 if (currentStep === 2) statusVal = "PREPARING";
                 if (currentStep === 3) statusVal = "IN_TRANSIT";
                 if (currentStep === 4) statusVal = "IN_TRANSIT";
-                if (currentStep === 5) {
-                    statusVal = "DELIVERED";
-                    fulfilledVal = "14:38:00";
-                }
+                if (currentStep >= 5)  statusVal = "DELIVERED";
 
                 let highlightClass = currentStep === 1 ? "new-row-highlight" : "";
                 let driverHighlight = currentStep === 3 ? "cell-update-highlight" : "";
-                let statusHighlight = currentStep >= 2 ? "cell-update-highlight" : "";
-                let fulfilledHighlight = currentStep === 5 ? "cell-update-highlight" : "";
+                let statusHighlight = currentStep >= 2 && currentStep <= 5 ? "cell-update-highlight" : "";
 
                 orderHtml += `
                     <tr class="${highlightClass}">
@@ -524,9 +479,7 @@
                         <td class="${driverHighlight}">${driverIdVal}</td>
                         <td>3</td>
                         <td class="${statusHighlight}">${statusVal}</td>
-                        <td>0.00</td>
                         <td>14:25:00</td>
-                        <td class="${fulfilledHighlight}">${fulfilledVal}</td>
                     </tr>
                 `;
             }
@@ -557,6 +510,9 @@
             if (currentStep >= 3 && currentStep < 5) {
                 cellDriverStatus.innerText = "BUSY";
                 cellDriverStatus.className = "cell-update-highlight";
+            } else if (currentStep >= 5) {
+                cellDriverStatus.innerText = "AVAILABLE";
+                cellDriverStatus.className = "cell-update-highlight";
             } else {
                 cellDriverStatus.innerText = "AVAILABLE";
                 cellDriverStatus.className = "";
@@ -565,8 +521,8 @@
             // --- RENDER LOCATION_TRACE TABLE ---
             const tbodyTrace = document.getElementById('tbody-location-trace');
             let traceHtml = `
-                <tr><td class="pk-text">999</td><td>1</td><td>(17.5212, 78.5412)</td><td>14:23:00</td></tr>
-                <tr><td class="pk-text">1000</td><td>2</td><td>(17.5231, 78.5431)</td><td>14:24:00</td></tr>
+                <tr><td class="pk-text">999</td><td>1</td><td class="spatial-data">POINT(78.5412 17.5212)</td><td>14:23:00</td></tr>
+                <tr><td class="pk-text">1000</td><td>2</td><td class="spatial-data">POINT(78.5431 17.5231)</td><td>14:24:00</td></tr>
             `;
             if (currentStep >= 4) {
                 let highlightClass = currentStep === 4 ? "new-row-highlight" : "";
@@ -574,8 +530,18 @@
                     <tr class="${highlightClass}">
                         <td class="pk-text">1001</td>
                         <td>2</td>
-                        <td>(17.5215, 78.5415)</td>
+                        <td class="spatial-data">POINT(78.5415 17.5215)</td>
                         <td>14:26:15</td>
+                    </tr>
+                `;
+            }
+            if (currentStep === 6) {
+                traceHtml += `
+                    <tr class="cell-breach-highlight">
+                        <td class="pk-text">1002</td>
+                        <td>2</td>
+                        <td class="spatial-data text-rose-300 font-bold">POINT(78.5465 17.5215)</td>
+                        <td>14:38:22</td>
                     </tr>
                 `;
             }
@@ -591,8 +557,6 @@
 
             svg.innerHTML = '';
 
-            const data = steps[currentStep];
-
             connections.forEach(c => {
                 const elFrom = document.getElementById(`card-${c.from}`);
                 const elTo = document.getElementById(`card-${c.to}`);
@@ -606,13 +570,22 @@
                 const x2 = (rTo.left + rTo.width / 2) - svgRect.left;
                 const y2 = (rTo.top + rTo.height / 2) - svgRect.top;
 
-                const isActive = data.activeConnectors.includes(c.id);
+                const isActive = c.triggerAt.includes(currentStep);
+                const isBreach = (currentStep === 6 && (c.id === 'conn-driver-trace' || c.id === 'conn-zone-loc'));
 
                 // Connector line
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 const dy = (y2 - y1) / 2;
                 path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${y1 + dy}, ${x2} ${y2 - dy}, ${x2} ${y2}`);
-                path.setAttribute('class', isActive ? 'fk-line fk-line-active' : 'fk-line');
+                
+                if (isBreach) {
+                    path.setAttribute('class', 'fk-line fk-line-breach');
+                } else if (isActive) {
+                    path.setAttribute('class', 'fk-line fk-line-active');
+                } else {
+                    path.setAttribute('class', 'fk-line');
+                }
+                
                 path.setAttribute('id', c.id);
                 svg.appendChild(path);
 
@@ -628,8 +601,17 @@
                 rect.setAttribute('width', 36);
                 rect.setAttribute('height', 22);
                 rect.setAttribute('rx', 5);
-                rect.setAttribute('fill', isActive ? '#020617' : '#0f172a');
-                rect.setAttribute('stroke', isActive ? '#38bdf8' : '#334155');
+                
+                if (isBreach) {
+                    rect.setAttribute('fill', '#4c0519');
+                    rect.setAttribute('stroke', '#f43f5e');
+                } else if (isActive) {
+                    rect.setAttribute('fill', '#020617');
+                    rect.setAttribute('stroke', '#38bdf8');
+                } else {
+                    rect.setAttribute('fill', '#0f172a');
+                    rect.setAttribute('stroke', '#334155');
+                }
                 rect.setAttribute('stroke-width', '1.5');
 
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
