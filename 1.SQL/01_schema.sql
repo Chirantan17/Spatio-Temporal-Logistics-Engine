@@ -3,9 +3,21 @@
 -- 01_schema.sql: Authoritative Relational & Spatiotemporal Schema (3NF)
 -- ============================================================================
 
-\c campus_delivery;
-
 CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- ----------------------------------------------------------------------------
+-- 0. CLEAN SLATE FOR RE-RUNS
+-- ----------------------------------------------------------------------------
+DROP TABLE IF EXISTS security_breach_log CASCADE;
+DROP TABLE IF EXISTS location_trace CASCADE;
+DROP TABLE IF EXISTS order_item CASCADE;
+DROP TABLE IF EXISTS "order" CASCADE;
+DROP TABLE IF EXISTS delivery_location CASCADE;
+DROP TABLE IF EXISTS campus_zone CASCADE;
+DROP TABLE IF EXISTS menu_item CASCADE;
+DROP TABLE IF EXISTS driver CASCADE;
+DROP TABLE IF EXISTS restaurant CASCADE;
+DROP TABLE IF EXISTS customer CASCADE;
 
 -- ----------------------------------------------------------------------------
 -- 1. MASTER DOMAIN ENTITIES (Canonical Vocabulary Enforced)
@@ -54,7 +66,7 @@ CREATE TABLE driver (
 );
 
 -- ----------------------------------------------------------------------------
--- 2. SPATIAL GEOMETRIES & GEOFENCES (Canonical Vocabulary: AUTHORIZED_CORRIDOR)
+-- 2. SPATIAL GEOMETRIES & GEOFENCES
 -- ----------------------------------------------------------------------------
 
 CREATE TABLE campus_zone (

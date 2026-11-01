@@ -3,7 +3,6 @@
 -- 04_spatial_queries.sql: Spatial PostGIS Geofence & Proximity Analysis
 -- ============================================================================
 
-\c campus_delivery;
 
 -- Q4.1: Spatial Join - Identify Canteens Located Within Campus Zones
 SELECT r.restaurant_id, r.name AS canteen_name, cz.zone_name

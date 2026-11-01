@@ -3,7 +3,6 @@
 -- Spatiotemporal Analytical Query Workload & Window Functions
 -- ============================================================================
 
-\c campus_delivery;
 
 -- ----------------------------------------------------------------------------
 -- A8.1: Actual Spatial Trajectory Reconstruction

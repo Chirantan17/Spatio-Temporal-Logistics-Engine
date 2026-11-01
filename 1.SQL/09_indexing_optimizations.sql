@@ -1,4 +1,3 @@
-\c campus_delivery;
 
 -- 1. SPATIAL ACCESS METHODS (GiST)
 DROP INDEX IF EXISTS idx_location_trace_gist;

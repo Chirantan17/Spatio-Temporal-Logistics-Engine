@@ -1,4 +1,3 @@
-\c campus_delivery;
 
 -- M6: Quantifying the Impact of Dynamic Driver Pre-allocation at High-Density Dining Corridors
 -- Fixes Audit 5.E: Ensures reproducible experimental conditions and proper metric conversion.

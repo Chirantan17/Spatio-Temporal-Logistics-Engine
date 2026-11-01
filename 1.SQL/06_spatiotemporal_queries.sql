@@ -3,7 +3,6 @@
 -- 06_spatiotemporal_queries.sql: Combined Spatiotemporal Fleet Routing
 -- ============================================================================
 
-\c campus_delivery;
 
 -- Q6.1: Metric Distance from Available Drivers to Active Outlets using Latest GPS Observation
 WITH latest_telemetry AS (

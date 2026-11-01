@@ -3,7 +3,6 @@
 -- 07_order_lifecycle.sql: Transactional State Machine & Atomic Dispatch
 -- ============================================================================
 
-\c campus_delivery;
 
 -- ----------------------------------------------------------------------------
 -- 1. ATOMIC DISPATCH WITH ROW-LEVEL LOCKING & METRIC DISTANCE KNN

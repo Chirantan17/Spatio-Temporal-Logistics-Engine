@@ -3,7 +3,6 @@
 -- Server-Side Security Triggers & State-Machine Enforcement
 -- ============================================================================
 
-\c campus_delivery;
 
 -- ----------------------------------------------------------------------------
 -- 1. SPATIAL PERIMETER BREACH TRIGGER

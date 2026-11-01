@@ -3,7 +3,6 @@
 -- 05_temporal_queries.sql: Temporal Windows and Telemetry Recency
 -- ============================================================================
 
-\c campus_delivery;
 
 -- Q5.1: Active Shift Orders
 SELECT o.order_id, c.name AS customer_name, o.status, o.created_at

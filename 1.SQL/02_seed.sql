@@ -3,8 +3,6 @@
 -- 02_seed.sql: Ground Truth Dataset for BITS Hyderabad Campus
 -- ============================================================================
 
-\c campus_delivery;
-
 -- Clear existing data in correct dependency order
 TRUNCATE security_breach_log, location_trace, order_item, "order", delivery_location, campus_zone, menu_item, driver, restaurant, customer RESTART IDENTITY CASCADE;
 
@@ -62,10 +60,10 @@ INSERT INTO location_trace (driver_id, location, recorded_at) VALUES
 (2, ST_SetSRID(ST_MakePoint(78.5414, 17.5216), 4326), CURRENT_TIMESTAMP - INTERVAL '1 minute'),
 (3, ST_SetSRID(ST_MakePoint(78.5374, 17.5219), 4326), CURRENT_TIMESTAMP - INTERVAL '1 minute');
 
--- 8. Seed Sample Orders
-INSERT INTO "order" (order_id, customer_id, restaurant_id, destination_id, status, delivery_fee) VALUES
-('ORD-10', 1, 1, 3, 'READY', 15.00),
-('ORD-11', 2, 3, 1, 'CANCELLED', 15.00);
+-- 8. Seed Sample Orders (Includes full timestamp suite for analytical queries)
+INSERT INTO "order" (order_id, customer_id, restaurant_id, driver_id, destination_id, status, delivery_fee, surge_bonus, created_at, ready_at, dispatched_at, fulfilled_at) VALUES
+('ORD-10', 1, 1, 2, 3, 'DELIVERED', 15.00, 0.00, CURRENT_TIMESTAMP - INTERVAL '30 minutes', CURRENT_TIMESTAMP - INTERVAL '20 minutes', CURRENT_TIMESTAMP - INTERVAL '18 minutes', CURRENT_TIMESTAMP - INTERVAL '5 minutes'),
+('ORD-11', 2, 3, NULL, 1, 'CANCELLED', 15.00, 0.00, CURRENT_TIMESTAMP - INTERVAL '40 minutes', NULL, NULL, NULL);
 
 INSERT INTO order_item (order_id, item_id, restaurant_id, quantity, price_at_order) VALUES
 ('ORD-10', 1, 1, 1, 120.00),

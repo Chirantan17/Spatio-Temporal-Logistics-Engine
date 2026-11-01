@@ -3,7 +3,6 @@
 -- 03_basic_queries.sql: Baseline Relational Inquiries
 -- ============================================================================
 
-\c campus_delivery;
 
 -- Q3.1: Active Facilities and Aggregate Counts
 SELECT facility_type, COUNT(*) AS total_facilities
