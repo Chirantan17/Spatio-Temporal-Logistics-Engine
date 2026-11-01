@@ -1,3 +1,7 @@
+-- ============================================================================
+-- CS G516: Advanced Database Systems
+-- 09_indexing_optimizations.sql: Spatial, Temporal & Partial Index Optimization
+-- ============================================================================
 
 -- 1. SPATIAL ACCESS METHODS (GiST)
 DROP INDEX IF EXISTS idx_location_trace_gist;
@@ -17,10 +21,17 @@ DROP INDEX IF EXISTS idx_order_active_hotpath;
 CREATE INDEX idx_order_active_hotpath ON "order" (restaurant_id, created_at) 
 WHERE status IN ('PENDING', 'PREPARING', 'READY');
 
--- Isolates available fleet members for PostGIS KNN dispatch calculations (Fixes Audit 5.C.1)
+-- Isolates available fleet members for PostGIS KNN dispatch calculations
 DROP INDEX IF EXISTS idx_driver_available_pool;
 CREATE INDEX idx_driver_available_pool ON driver (driver_id) WHERE status = 'AVAILABLE';
 
--- 4. PHYSICAL CLUSTERING
+-- 4. PHYSICAL CLUSTERING & STATISTICS UPDATE
 CLUSTER location_trace USING idx_location_trace_gist;
-ANALYZE "order"; ANALYZE location_trace;
+ANALYZE "order";
+ANALYZE location_trace;
+
+-- 5. VERIFICATION QUERY (Provides tabular output for GUI extensions)
+SELECT tablename, indexname 
+FROM pg_indexes 
+WHERE schemaname = 'public' AND indexname LIKE 'idx_%'
+ORDER BY tablename, indexname;

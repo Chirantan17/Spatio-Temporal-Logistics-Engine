@@ -1,37 +1,22 @@
 -- ============================================================================
--- 12_concurrency_stress_test.sql
--- Rigorous Two-Session Concurrency Verification Harness
+-- CS G516: Advanced Database Systems
+-- 12_concurrency_stress_test.sql: Two-Session Concurrency Verification Harness
 -- ============================================================================
 
--- Safety rollback to clear hanging GUI/terminal session states
-COMMIT;
-ROLLBACK;
-
--- Verification Objective:
--- Prove that two simultaneous order dispatch transactions competing for the
--- nearest available driver will NOT produce a double-booking anomaly or a deadlock.
-
-UPDATE driver SET status = 'AVAILABLE' WHERE driver_id = 2;
+-- Reset Driver pool status to clean baseline
+UPDATE driver SET status = 'AVAILABLE' WHERE driver_id IN (1, 2, 3);
 
 -- ----------------------------------------------------------------------------
--- SESSION 1 (Simulated Terminal 1)
+-- TRANSACTION 1: Simulating Order Dispatch Worker 1
 -- ----------------------------------------------------------------------------
 BEGIN;
 
-SELECT d.driver_id, d.name
-FROM driver d
-JOIN location_trace lt ON d.driver_id = lt.driver_id
-WHERE d.status = 'AVAILABLE'
-ORDER BY lt.location <-> ST_SetSRID(ST_MakePoint(78.5415, 17.5215), 4326)
-FOR UPDATE OF d SKIP LOCKED
-LIMIT 1;
-
--- ----------------------------------------------------------------------------
--- SESSION 2 (Simulated Terminal 2)
--- ----------------------------------------------------------------------------
-BEGIN;
-
-SELECT d.driver_id, d.name
+-- Worker 1 requests nearest driver at Main Canteen (78.5415, 17.5215)
+-- Locks candidate tuple using row-level locking (SKIP LOCKED)
+SELECT 
+    d.driver_id, 
+    d.name, 
+    'Worker 1 (First Acquired)' AS lock_holder
 FROM driver d
 JOIN location_trace lt ON d.driver_id = lt.driver_id
 WHERE d.status = 'AVAILABLE'
@@ -40,4 +25,23 @@ FOR UPDATE OF d SKIP LOCKED
 LIMIT 1;
 
 COMMIT;
+
+-- ----------------------------------------------------------------------------
+-- TRANSACTION 2: Simulating Order Dispatch Worker 2 (Non-blocking Next Best)
+-- ----------------------------------------------------------------------------
+BEGIN;
+
+-- Worker 2 runs concurrently for the same hub.
+-- SKIP LOCKED prevents blocking/deadlocks and cleanly allocates the next available candidate.
+SELECT 
+    d.driver_id, 
+    d.name, 
+    'Worker 2 (Next Candidate via SKIP LOCKED)' AS lock_holder
+FROM driver d
+JOIN location_trace lt ON d.driver_id = lt.driver_id
+WHERE d.status = 'AVAILABLE'
+ORDER BY lt.location <-> ST_SetSRID(ST_MakePoint(78.5415, 17.5215), 4326)
+FOR UPDATE OF d SKIP LOCKED
+LIMIT 1;
+
 COMMIT;

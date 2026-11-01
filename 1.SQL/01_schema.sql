@@ -133,3 +133,11 @@ CREATE TABLE security_breach_log (
     breach_point geometry(Point, 4326) NOT NULL,
     detected_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ----------------------------------------------------------------------------
+-- 4. VERIFICATION QUERY (Provides tabular output for GUI extensions)
+-- ----------------------------------------------------------------------------
+SELECT table_name, table_type 
+FROM information_schema.tables 
+WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+ORDER BY table_name;

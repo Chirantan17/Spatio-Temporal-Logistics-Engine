@@ -68,3 +68,24 @@ INSERT INTO "order" (order_id, customer_id, restaurant_id, driver_id, destinatio
 INSERT INTO order_item (order_id, item_id, restaurant_id, quantity, price_at_order) VALUES
 ('ORD-10', 1, 1, 1, 120.00),
 ('ORD-11', 3, 3, 1, 90.00);
+
+-- ----------------------------------------------------------------------------
+-- 9. VERIFICATION QUERY (Provides tabular output for GUI extensions)
+-- ----------------------------------------------------------------------------
+SELECT 'customers' AS entity, count(*) AS total_records FROM customer
+UNION ALL
+SELECT 'restaurants', count(*) FROM restaurant
+UNION ALL
+SELECT 'menu_items', count(*) FROM menu_item
+UNION ALL
+SELECT 'drivers', count(*) FROM driver
+UNION ALL
+SELECT 'campus_zones', count(*) FROM campus_zone
+UNION ALL
+SELECT 'delivery_locations', count(*) FROM delivery_location
+UNION ALL
+SELECT 'orders', count(*) FROM "order"
+UNION ALL
+SELECT 'order_items', count(*) FROM order_item
+UNION ALL
+SELECT 'location_traces', count(*) FROM location_trace;

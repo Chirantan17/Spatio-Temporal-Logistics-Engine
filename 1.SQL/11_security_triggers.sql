@@ -1,8 +1,7 @@
 -- ============================================================================
--- 11_security_triggers.sql
--- Server-Side Security Triggers & State-Machine Enforcement
+-- CS G516: Advanced Database Systems
+-- 11_security_triggers.sql: Server-Side Security Triggers & State-Machine Enforcement
 -- ============================================================================
-
 
 -- ----------------------------------------------------------------------------
 -- 1. SPATIAL PERIMETER BREACH TRIGGER
@@ -15,7 +14,6 @@ DECLARE
     v_zone_name VARCHAR(100);
     v_active_order_id VARCHAR(20);
 BEGIN
-    -- Corrected boolean precedence using explicit parentheses
     SELECT cz.zone_id, cz.zone_name 
     INTO v_zone_id, v_zone_name
     FROM campus_zone cz
@@ -24,13 +22,11 @@ BEGIN
     LIMIT 1;
 
     IF v_zone_id IS NOT NULL THEN
-        -- Find driver's active in-flight order
         SELECT order_id INTO v_active_order_id
         FROM "order"
         WHERE driver_id = NEW.driver_id AND status = 'IN_TRANSIT'
         LIMIT 1;
 
-        -- Insert audit entry matching schema
         INSERT INTO security_breach_log (
             driver_id,
             order_id,
@@ -68,12 +64,10 @@ EXECUTE FUNCTION fn_audit_spatial_breach();
 CREATE OR REPLACE FUNCTION fn_enforce_order_state_transitions()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Allow no-op status updates
     IF OLD.status = NEW.status THEN
         RETURN NEW;
     END IF;
 
-    -- Strict allowable state transitions
     IF OLD.status = 'PENDING' AND NEW.status NOT IN ('PREPARING', 'CANCELLED') THEN
         RAISE EXCEPTION 'Illegal order transition: PENDING -> %', NEW.status;
     ELSIF OLD.status = 'PREPARING' AND NEW.status NOT IN ('READY', 'CANCELLED') THEN
@@ -88,7 +82,6 @@ BEGIN
         RAISE EXCEPTION 'Terminal state % is immutable. Cannot transition to %.', OLD.status, NEW.status;
     END IF;
 
-    -- Automatically handle timestamping
     IF NEW.status = 'PREPARING' AND OLD.status = 'PENDING' THEN
         -- Preparation begun
     ELSIF NEW.status = 'READY' THEN
@@ -108,3 +101,12 @@ CREATE TRIGGER trg_order_state_transition
 BEFORE UPDATE OF status ON "order"
 FOR EACH ROW
 EXECUTE FUNCTION fn_enforce_order_state_transitions();
+
+-- ----------------------------------------------------------------------------
+-- 3. VERIFICATION QUERY (Provides tabular output for GUI extensions)
+-- ----------------------------------------------------------------------------
+SELECT tgname AS active_trigger, relname AS target_table
+FROM pg_trigger t
+JOIN pg_class c ON t.tgrelid = c.oid
+WHERE tgname IN ('trg_audit_spatial_breach', 'trg_order_state_transition')
+ORDER BY target_table;

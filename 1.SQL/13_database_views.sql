@@ -1,6 +1,6 @@
 -- ============================================================================
--- 13_database_views.sql
--- Fleet Proximity & Financial Audit Execution Views
+-- CS G516: Advanced Database Systems
+-- 13_database_views.sql: Fleet Proximity & Financial Audit Execution Views
 -- ============================================================================
 
 -- View 1: Real-time Fleet Proximity
@@ -24,3 +24,11 @@ FROM "order" o
 JOIN restaurant r ON o.restaurant_id = r.restaurant_id
 JOIN customer c ON o.customer_id = c.customer_id
 LEFT JOIN driver d ON o.driver_id = d.driver_id;
+
+-- ----------------------------------------------------------------------------
+-- VERIFICATION QUERY (Provides tabular output for GUI extensions)
+-- ----------------------------------------------------------------------------
+SELECT table_name AS registered_view, view_definition 
+FROM information_schema.views 
+WHERE table_schema = 'public' AND table_name LIKE 'view_%'
+ORDER BY table_name;

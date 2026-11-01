@@ -3,7 +3,6 @@
 -- 07_order_lifecycle.sql: Transactional State Machine & Atomic Dispatch
 -- ============================================================================
 
-
 -- ----------------------------------------------------------------------------
 -- 1. ATOMIC DISPATCH WITH ROW-LEVEL LOCKING & METRIC DISTANCE KNN
 -- ----------------------------------------------------------------------------
@@ -207,3 +206,12 @@ BEGIN
     RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- 3. VERIFICATION QUERY (Provides tabular output for GUI extensions)
+-- ----------------------------------------------------------------------------
+SELECT routine_name AS registered_function, routine_type 
+FROM information_schema.routines 
+WHERE routine_schema = 'public' 
+  AND routine_name IN ('dispatch_order_atomic', 'complete_order_handover')
+ORDER BY routine_name;
