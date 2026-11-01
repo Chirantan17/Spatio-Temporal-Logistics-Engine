@@ -1,19 +1,28 @@
-# Find the active PostGIS/Postgres container name dynamically from Docker
-$containerId = (docker ps --filter "ancestor=postgis/postgis" --format "{{.ID}}") | Select-Object -First 1
+$containerName = "spatio-temporal-logistics-engine-db"
 
-if (-not $containerId) {
-    # Fallback to checking any running container with postgres in the name
-    $containerId = (docker ps --format "{{.ID}} {{.Names}}" | Select-String -Pattern "postgres|postgis|db" | Select-Object -First 1).Line.Split(" ")[0]
+$check = docker ps --filter "name=$containerName" --format "{{.Names}}"
+if (-not $check) {
+    Write-Host "[ERROR] Container $containerName is not running. Starting it..." -ForegroundColor Yellow
+    cd .\4.Requirements
+    docker compose -p spatio-temporal-logistics-engine up -d
+    cd ..
+    Start-Sleep -Seconds 4
 }
 
-if (-not $containerId) {
-    Write-Host "[ERROR] No running PostgreSQL/PostGIS Docker container found! Please ensure your Docker container is started." -ForegroundColor Red
-    exit 1
-}
+Write-Host "[INFO] Target Container: $containerName" -ForegroundColor Green
 
-Write-Host "[INFO] Target Docker Container ID: $containerId" -ForegroundColor Green
+# Recreate fresh campus_delivery from default 'postgres' database
+Write-Host "[INIT] Recreating fresh 'campus_delivery' database..." -ForegroundColor Yellow
+$initSql = @"
+REVOKE CONNECT ON DATABASE campus_delivery FROM public;
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'campus_delivery' AND pid <> pg_backend_pid();
+DROP DATABASE IF EXISTS campus_delivery;
+CREATE DATABASE campus_delivery;
+\c campus_delivery
+CREATE EXTENSION IF NOT EXISTS postgis;
+"@
+$initSql | docker exec -i $containerName psql -U postgres -d postgres
 
-# Define ordered execution pipeline for 1.SQL
 $sqlFiles = @(
     "01_schema.sql",
     "02_seed.sql",
@@ -33,17 +42,13 @@ $sqlFiles = @(
 foreach ($file in $sqlFiles) {
     $filePath = ".\1.SQL\$file"
     if (Test-Path $filePath) {
-        Write-Host "[EXEC] Running $file inside container..." -ForegroundColor Cyan
-        
-        # Read local file content and pipe it straight into docker exec psql
-        Get-Content $filePath -Raw | docker exec -i $containerId psql -U postgres -d campus_delivery
-        
+        Write-Host "[EXEC] Deploying $file..." -ForegroundColor Cyan
+        Get-Content $filePath -Raw | docker exec -i $containerName psql -U postgres -d campus_delivery -v ON_ERROR_STOP=1
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "[WARNING] Execution of $file finished with exit code $LASTEXITCODE" -ForegroundColor Yellow
+            Write-Host "[ERROR] Failed executing $file" -ForegroundColor Red
+            exit $LASTEXITCODE
         }
-    } else {
-        Write-Host "[SKIP] $file not found in 1.SQL folder." -ForegroundColor Yellow
     }
 }
 
-Write-Host "[SUCCESS] Complete database schema, seeds, indexes, and triggers deployed to Docker PostgreSQL!" -ForegroundColor Green
+Write-Host "`n[SUCCESS] All 13 SQL pipelines deployed cleanly with 0 errors to $containerName!" -ForegroundColor Green

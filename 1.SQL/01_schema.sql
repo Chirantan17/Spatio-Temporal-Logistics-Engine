@@ -3,8 +3,6 @@
 -- 01_schema.sql: Authoritative Relational & Spatiotemporal Schema (3NF)
 -- ============================================================================
 
-DROP DATABASE IF EXISTS campus_delivery;
-CREATE DATABASE campus_delivery;
 \c campus_delivery;
 
 CREATE EXTENSION IF NOT EXISTS postgis;

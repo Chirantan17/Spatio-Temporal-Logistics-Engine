@@ -1,43 +1,51 @@
--- Q3.0: SYSTEM INTEGRITY AUDIT (View Q3.0)
-SELECT * FROM integrity_audit;
+-- ============================================================================
+-- CS G516: Advanced Database Systems
+-- 03_basic_queries.sql: Baseline Relational Inquiries
+-- ============================================================================
 
--- Q3.1: Dining Infrastructure Summary (Count by facility type)
+\c campus_delivery;
+
+-- Q3.1: Active Facilities and Aggregate Counts
 SELECT facility_type, COUNT(*) AS total_facilities
 FROM restaurant
-GROUP BY facility_type
-ORDER BY facility_type;
+GROUP BY facility_type;
 
--- Q3.2: Complete List of Active Campus Dining Hubs
+-- Q3.2: High-Rated Food Hubs (Rating >= 4.2)
 SELECT restaurant_id, name, facility_type, student_rating, phone
 FROM restaurant
-ORDER BY restaurant_id;
+WHERE student_rating >= 4.20
+ORDER BY student_rating DESC;
 
--- Q3.3: Menu Catalog for Main Canteen (Focusing on slot capacity and pricing)
-SELECT mi.item_id, mi.name AS item_name, mi.category, mi.price, mi.stove_units, mi.prep_time_minutes, r.name AS canteen_name
-FROM menu_item mi
-JOIN restaurant r ON mi.restaurant_id = r.restaurant_id
-WHERE r.name = 'Main Canteen (Academic Canteen)';
+-- Q3.3: Complete Menu Catalog with Outlet Join
+SELECT m.item_id, m.name AS item_name, m.category, m.price, m.stove_units, m.prep_time_minutes, r.name AS canteen_name
+FROM menu_item m
+JOIN restaurant r ON m.restaurant_id = r.restaurant_id
+ORDER BY r.name, m.price ASC;
 
--- Q3.4: List active pending/preparing orders with customer role hierarchy
-SELECT o.order_id, c.name AS customer_name, c.user_role, r.name AS canteen_name, o.status, o.created_at
+-- Q3.4: Orders by Customer Role
+SELECT o.order_id, c.name AS customer_name, c.campus_role, r.name AS canteen_name, o.status, o.created_at
 FROM "order" o
 JOIN customer c ON o.customer_id = c.customer_id
 JOIN restaurant r ON o.restaurant_id = r.restaurant_id
-WHERE o.status IN ('PENDING', 'PREPARING', 'IN_TRANSIT');
+ORDER BY o.created_at DESC;
 
--- Q3.5: Dynamic Order Invoice Calculation View (3NF Compliance)
-SELECT ot.order_id, ot.total_amount AS final_invoice_total, o.delivery_fee, o.status
-FROM order_total ot
-JOIN "order" o ON ot.order_id = o.order_id
-ORDER BY ot.order_id;
+-- Q3.5: Financial Ledger Overview
+SELECT order_id, delivery_fee, surge_bonus, (delivery_fee + surge_bonus) AS total_delivery_comp, status
+FROM "order";
 
--- Q3.6: Fleet Bag Capacity Audit
-SELECT * FROM driver_bag_capacity_view
-ORDER BY current_items_in_bag DESC;
+-- Q3.6: Fleet Status and Uniform Bag Capacity Accounting
+SELECT d.driver_id, d.name, d.status, d.max_bag_capacity,
+       COALESCE(SUM(oi.quantity), 0) AS current_items_in_bag,
+       (d.max_bag_capacity - COALESCE(SUM(oi.quantity), 0)) AS remaining_slots
+FROM driver d
+LEFT JOIN "order" o ON d.driver_id = o.driver_id AND o.status = 'IN_TRANSIT'
+LEFT JOIN order_item oi ON o.order_id = oi.order_id
+GROUP BY d.driver_id, d.name, d.status, d.max_bag_capacity
+ORDER BY d.driver_id;
 
--- Q3.7: Staged Drivers per Dining Hub Verification (2 units per hub guarantee)
+-- Q3.7: Staged Drivers Stationed per Dining Hub
 SELECT r.name AS dining_hub, COUNT(d.driver_id) AS staged_driver_count
 FROM restaurant r
-LEFT JOIN driver d ON r.restaurant_id = d.staging_restaurant_id
-GROUP BY r.restaurant_id, r.name
-ORDER BY r.restaurant_id;
+LEFT JOIN driver d ON r.restaurant_id = d.staged_hub_id
+GROUP BY r.name
+ORDER BY staged_driver_count DESC;

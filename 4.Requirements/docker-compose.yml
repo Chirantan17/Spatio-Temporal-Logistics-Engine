@@ -1,17 +1,16 @@
-version: '3.8'
-
 services:
   db:
     image: postgis/postgis:15-3.3
-    container_name: campus_spatial_db
+    container_name: spatio-temporal-logistics-engine-db
+    restart: always
     environment:
-      POSTGRES_DB: campus_delivery
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata_engine:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  pgdata_engine:
