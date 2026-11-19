@@ -18,30 +18,90 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
     border-bottom: 1px solid #1e293b;
     padding-bottom: 12px;
     margin-bottom: 18px;
   }
   .topbar h1 { margin: 0; font-size: 1.35rem; color: #38bdf8; letter-spacing: 0.2px; }
   .topbar p { margin: 3px 0 0; color: #94a3b8; font-size: 0.82rem; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
   .badge-live {
     background: rgba(34, 197, 94, 0.12);
     border: 1px solid rgba(34, 197, 94, 0.4);
     color: #4ade80;
     font-family: Consolas, monospace;
-    font-size: 0.78rem;
-    padding: 5px 12px;
+    font-size: 0.76rem;
+    padding: 6px 12px;
     border-radius: 999px;
     font-weight: 600;
   }
 
-  /* Main Layout matching sketch: Left (Charts + Live Line Graph) | Right (Explanation & Short Notes) */
+  /* PostgreSQL Connection Toggle Button */
+  .pg-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: Consolas, monospace;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(16, 185, 129, 0.16);
+    border: 1px solid #10b981;
+    color: #34d399;
+  }
+  .pg-toggle:hover { background: rgba(16, 185, 129, 0.26); }
+  .pg-toggle .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+  }
+  .pg-toggle.disconnected {
+    background: rgba(244, 63, 94, 0.16);
+    border-color: #f43f5e;
+    color: #fb7185;
+  }
+  .pg-toggle.disconnected .dot {
+    background: #f43f5e;
+    box-shadow: 0 0 8px #f43f5e;
+  }
+
+  /* Main Layout */
   .workspace {
     display: grid;
-    grid-template-columns: 1fr 370px;
+    grid-template-columns: 1fr 375px;
     gap: 18px;
     align-items: start;
+    position: relative;
+    transition: opacity 0.25s ease;
   }
+  .workspace.offline-locked {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: grayscale(60%);
+  }
+  .offline-banner {
+    display: none;
+    background: rgba(244, 63, 94, 0.14);
+    border: 1px solid rgba(244, 63, 94, 0.5);
+    color: #fda4af;
+    font-family: Consolas, monospace;
+    font-size: 0.82rem;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .offline-banner.visible { display: block; }
+
   .left-col { display: flex; flex-direction: column; gap: 16px; }
 
   /* KPI Strip */
@@ -89,7 +149,7 @@
   .wf-title span { font-size: 0.76rem; color: #94a3b8; }
 
   .controls { display: flex; align-items: center; gap: 8px; }
-  button {
+  button.ctrl {
     border: none;
     border-radius: 7px;
     padding: 7px 13px;
@@ -101,7 +161,7 @@
   .btn-play { background: #22c55e; color: #052e16; }
   .btn-play:hover { background: #4ade80; }
   .btn-play.paused { background: #38bdf8; color: #082f49; }
-  .btn-sec { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+  .btn-sec { background: #1e293b; color: #e2e8f0; border: 1px solid #334155 !important; }
   .btn-sec:hover { background: #334155; }
   .speed-select {
     background: #0f172a;
@@ -237,10 +297,20 @@
       <h1>CS G516: Spatiotemporal Indexing &amp; Live Execution Benchmarks</h1>
       <p>PostgreSQL 15 + PostGIS 3.3 &bull; 50,000 Sequential Telemetry Pings (<code>14_benchmark_suite.sql</code>)</p>
     </div>
-    <div class="badge-live" id="status-pill">&#9679; READY &mdash; CLICK PLAY OR STEP</div>
+    <div class="topbar-right">
+      <div class="badge-live" id="status-pill">&#9679; READY &mdash; CLICK PLAY OR STEP</div>
+      <button id="pg-conn-btn" class="pg-toggle" onclick="togglePgConnection()" title="Toggle PostgreSQL Engine Connection">
+        <span class="dot"></span>
+        <span id="pg-conn-lbl">PostgreSQL Connected</span>
+      </button>
+    </div>
   </div>
 
-  <div class="workspace">
+  <div id="offline-banner" class="offline-banner">
+    &#9888; ENGINE DISCONNECTED &mdash; Click "PostgreSQL Disconnected" in the top-right corner to reconnect and resume live workflow execution.
+  </div>
+
+  <div class="workspace" id="workspace-main">
     <!-- LEFT COLUMN: Top Static Benchmarks + Bottom Live Line Graph -->
     <div class="left-col">
       <div class="kpis">
@@ -282,12 +352,12 @@
         <div class="wf-header">
           <div class="wf-title">
             <h2>Live End-to-End Execution Workflow: Brute-Force vs. Indexed</h2>
-            <span>Click <b>Play</b> to watch latency spikes across Customer &rarr; Kitchen &rarr; Fleet &rarr; Security &rarr; Handover (or click any dot/phase)</span>
+            <span>Click <b>Play</b> to watch latency spikes &amp; real-world index tradeoffs across the pipeline (or click any dot)</span>
           </div>
           <div class="controls">
-            <button id="btn-play" class="btn-play" onclick="togglePlay()">&#9654; Play Workflow</button>
-            <button class="btn-sec" onclick="stepForward()">Step &rarr;</button>
-            <button class="btn-sec" onclick="resetWorkflow()">Reset</button>
+            <button id="btn-play" class="ctrl btn-play" onclick="togglePlay()">&#9654; Play Workflow</button>
+            <button class="ctrl btn-sec" onclick="stepForward()">Step &rarr;</button>
+            <button class="ctrl btn-sec" onclick="resetWorkflow()">Reset</button>
             <select id="speed-sel" class="speed-select" onchange="updateSpeed()" title="Step Delay">
               <option value="2200" selected>2.2s / phase</option>
               <option value="1400">1.4s / phase</option>
@@ -311,14 +381,14 @@
         <p id="sp-desc">Verifies that the selected hostel/academic gate sits inside an authorized campus polygon before accepting checkout.</p>
         <div class="metric-compare">
           <span>Brute-Force: <span class="m-bad" id="sp-brute">4.8 ms</span></span>
-          <span>Indexed: <span class="m-good" id="sp-idx">0.14 ms</span></span>
+          <span>Indexed: <span class="m-good" id="sp-idx">0.45 ms</span></span>
         </div>
       </div>
 
       <div class="notes-box">
-        <h3>Why Brute-Force Spikes</h3>
+        <h3>Tradeoff &amp; Spike Analysis</h3>
         <div class="note-item" id="sp-why">
-          Without a spatial index, PostgreSQL runs polygon point-in-poly math across every boundary row sequentially. <strong>GiST</strong> prunes non-overlapping bounding boxes immediately.
+          Without a spatial index, PostgreSQL runs polygon math across every boundary row. <strong>GiST</strong> prunes bounding boxes immediately, leaving only minor planner &amp; geometry overhead (0.45 ms).
         </div>
       </div>
 
@@ -328,19 +398,52 @@
           <strong>GiST (2D Spatial):</strong> R-Tree bounding boxes on <code>location_trace</code> &amp; <code>campus_zone</code>; accelerates KNN <code>&lt;-&gt;</code> &amp; <code>ST_Contains</code>.
         </div>
         <div class="note-item">
-          <strong>BRIN (Time-Series):</strong> Block Range Index on append-only <code>recorded_at</code>; <strong>97.8% smaller</strong> than B-Tree (24 KB vs 1,112 KB).
+          <strong>BRIN (Time-Series):</strong> <strong>97.8% smaller</strong> than B-Tree (24 KB vs 1,112 KB), with a slight block-range scan bump (~2.8 ms) when reading recent windows—a classic space-vs-speed tradeoff.
         </div>
         <div class="note-item">
-          <strong>Partial Index (Hot-Path):</strong> Indexes only active orders &amp; <code>AVAILABLE</code> drivers in <strong>8.0 KB RAM</strong>; ignores historical deliveries.
+          <strong>Partial Index (Hot-Path):</strong> Keeps active orders in <strong>8.0 KB RAM</strong>; incurs minor write overhead on status transitions in exchange for fast queue reads.
         </div>
         <div class="note-item">
-          <strong>Query Optimizations:</strong> <code>DISTINCT ON</code> for single-pass latest GPS ping, <code>&lt;-&gt;</code> before spherical math, and <code>SKIP LOCKED</code> for deadlock-free dispatch.
+          <strong>Room for Future Scale:</strong> Time-based table partitioning on <code>location_trace</code> and async event queues for trigger audits.
         </div>
       </div>
     </aside>
   </div>
 
 <script>
+// --- 0. Dummy PostgreSQL Connection Toggle ---
+let isPgConnected = true;
+
+function togglePgConnection() {
+  isPgConnected = !isPgConnected;
+  const btn = document.getElementById('pg-conn-btn');
+  const lbl = document.getElementById('pg-conn-lbl');
+  const workspace = document.getElementById('workspace-main');
+  const banner = document.getElementById('offline-banner');
+  const pill = document.getElementById('status-pill');
+
+  if (isPgConnected) {
+    btn.classList.remove('disconnected');
+    lbl.innerText = 'PostgreSQL Connected';
+    workspace.classList.remove('offline-locked');
+    banner.classList.remove('visible');
+    pill.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+    pill.style.color = '#4ade80';
+    pill.style.background = 'rgba(34, 197, 94, 0.12)';
+    pill.innerHTML = '&#9679; CONNECTED &mdash; READY';
+  } else {
+    if (isPlaying) pausePlay();
+    btn.classList.add('disconnected');
+    lbl.innerText = 'PostgreSQL Disconnected';
+    workspace.classList.add('offline-locked');
+    banner.classList.add('visible');
+    pill.style.borderColor = 'rgba(244, 63, 94, 0.5)';
+    pill.style.color = '#fb7185';
+    pill.style.background = 'rgba(244, 63, 94, 0.15)';
+    pill.innerHTML = '&#9679; ENGINE OFFLINE';
+  }
+}
+
 // --- 1. Top Static Benchmark Charts ---
 const barOpt = {
   responsive: true,
@@ -383,7 +486,7 @@ new Chart(document.getElementById('c3'), {
   }
 });
 
-// --- 2. Bottom Live Workflow Line Chart Data ---
+// --- 2. Bottom Live Workflow Line Chart Data (Realistic Index Micro-Spikes Included) ---
 const phases = [
   {
     short: '1. Customer Gate',
@@ -391,19 +494,19 @@ const phases = [
     title: '1. Customer Drop-Off Gate Validation',
     desc: 'Checks that the chosen hostel/academic drop-off gate lies within a valid campus zone polygon during ACID order placement.',
     bruteMs: 4.8,
-    idxMs: 0.14,
+    idxMs: 0.45,
     isSpike: false,
-    why: '<b>GiST Spatial Index:</b> Eliminates full polygon scans by filtering campus zones via 2D bounding boxes before geometry containment.'
+    why: '<b>GiST Spatial Index:</b> Prunes non-overlapping campus polygons via 2D bounding boxes immediately, leaving only minor planner &amp; geometry verification cost (0.45 ms).'
   },
   {
     short: '2. Kitchen Queue',
     tag: 'PHASE 2 OF 6 • KITCHEN KOT (SPIKE #1)',
-    title: '2. Kitchen FIFO Queue & Hot-Path Poll',
-    desc: 'Kitchen terminal polls active PENDING/PREPARING orders to allocate stove slots without scanning thousands of past delivered orders.',
+    title: '2. Kitchen FIFO Queue & Partial Index Maintenance',
+    desc: 'Kitchen polls active PENDING/PREPARING orders while updating order state inside the partial hot-path index.',
     bruteMs: 11.4,
-    idxMs: 0.18,
+    idxMs: 1.65,
     isSpike: true,
-    why: '<b>Why Brute-Force Spikes:</b> Without a partial index, PostgreSQL scans all historical DELIVERED/CANCELLED rows on disk. Our <b>8.0 KB Partial Index</b> isolates only live orders in RAM.'
+    why: '<b>Real-World Write Tradeoff:</b> While reads stay fast in <b>8.0 KB RAM</b>, updating an order status forces PostgreSQL to insert/remove entries in the partial index (~1.65 ms bump vs 11.4 ms full scan).'
   },
   {
     short: '3. Fleet KNN',
@@ -417,23 +520,23 @@ const phases = [
   },
   {
     short: '4. GPS Stream',
-    tag: 'PHASE 4 OF 6 • TELEMETRY AUDIT (SPIKE #3)',
-    title: '4. High-Frequency GPS Ping & Ghost-Driver Check',
+    tag: 'PHASE 4 OF 6 • TELEMETRY AUDIT (INDEX BUMP)',
+    title: '4. High-Frequency GPS Ping & BRIN Block Scan',
     desc: 'Ingests live rider coordinates into append-only location_trace and checks >45s heartbeat timeouts.',
     bruteMs: 13.2,
-    idxMs: 0.31,
+    idxMs: 2.85,
     isSpike: true,
-    why: '<b>BRIN Time-Series Index:</b> Sequential timestamps let BRIN skip 98% of disk blocks using min/max ranges (24 KB vs 1,112 KB B-Tree), avoiding heavy B-Tree write amplification.'
+    why: '<b>BRIN Space-vs-Speed Tradeoff:</b> BRIN saves <b>97.8% storage</b> (24 KB vs 1,112 KB), but because it only tracks min/max per 128-page block, scanning recent pings shows a small ~2.85 ms bump—an area where time-partitioning can improve further.'
   },
   {
     short: '5. Security Trigger',
-    tag: 'PHASE 5 OF 6 • SECURITY COCKPIT (SPIKE #4)',
+    tag: 'PHASE 5 OF 6 • SECURITY COCKPIT (TRIGGER BUMP)',
     title: '5. Restricted Interior Perimeter Breach Trigger',
-    desc: 'An AFTER INSERT trigger checks every incoming GPS ping against RESTRICTED_INTERIOR hostel polygons.',
+    desc: 'Synchronous AFTER INSERT trigger evaluates ST_Contains on every incoming GPS ping against restricted polygons.',
     bruteMs: 9.6,
-    idxMs: 0.19,
+    idxMs: 2.35,
     isSpike: true,
-    why: '<b>Trigger + GiST Synergy:</b> Running ST_Contains on every GPS ping would stall ingestion without <code>idx_campus_zone_boundary_gist</code> keeping per-ping checks sub-millisecond.'
+    why: '<b>Synchronous Trigger Overhead:</b> Even with GiST spatial indexing, firing a row-level PL/pgSQL trigger on every GPS insert adds ~2.35 ms write latency—a realistic bottleneck we can discuss scaling via async workers.'
   },
   {
     short: '6. 100m Handover',
@@ -441,24 +544,22 @@ const phases = [
     title: '6. 100m Geofenced Delivery Handover',
     desc: 'Verifies driver is within 100m (ST_DWithin) of the student drop-off gate and commits final DELIVERED state.',
     bruteMs: 6.1,
-    idxMs: 0.16,
+    idxMs: 0.55,
     isSpike: false,
-    why: '<b>Clean Exit:</b> Once marked DELIVERED, the order automatically drops out of the <b>Partial Hot-Path Index</b>, keeping dispatch RAM permanently flat.'
+    why: '<b>Clean Exit:</b> Once marked DELIVERED, the order automatically drops out of the <b>Partial Hot-Path Index</b>, keeping active dispatch memory permanently bounded.'
   }
 ];
 
-let currentStep = 0; // 0 to phases.length - 1
+let currentStep = 0;
 let isPlaying = false;
 let timer = null;
 let stepDelay = 2200;
 
-// Render Phase Pills
 const pillsContainer = document.getElementById('phase-pills');
 pillsContainer.innerHTML = phases.map((p, i) => `
   <div class="pill ${p.isSpike ? 'spike' : ''}" id="pill-${i}" onclick="jumpToPhase(${i})">${p.short}</div>
 `).join('');
 
-// Initialize Workflow Line Chart
 const wfCtx = document.getElementById('wfChart').getContext('2d');
 const wfChart = new Chart(wfCtx, {
   type: 'line',
@@ -469,9 +570,9 @@ const wfChart = new Chart(wfCtx, {
         label: 'Brute-Force / Unindexed (ms)',
         data: [],
         borderColor: '#f43f5e',
-        backgroundColor: 'rgba(244, 63, 94, 0.15)',
+        backgroundColor: 'rgba(244, 63, 94, 0.14)',
         borderWidth: 2.5,
-        tension: 0.3,
+        tension: 0.32,
         fill: true,
         pointRadius: 6,
         pointHoverRadius: 9,
@@ -483,9 +584,9 @@ const wfChart = new Chart(wfCtx, {
         label: 'Indexed Engine: GiST + BRIN + Partial (ms)',
         data: [],
         borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.12)',
+        backgroundColor: 'rgba(34, 197, 94, 0.14)',
         borderWidth: 2.5,
-        tension: 0.3,
+        tension: 0.32,
         fill: true,
         pointRadius: 6,
         pointHoverRadius: 9,
@@ -500,8 +601,9 @@ const wfChart = new Chart(wfCtx, {
     maintainAspectRatio: false,
     animation: { duration: 450 },
     onClick: (e, elements) => {
+      if (!isPgConnected) return;
       if (elements.length > 0) {
-        pausePlay();
+        if (isPlaying) pausePlay();
         jumpToPhase(elements[0].index);
       }
     },
@@ -552,11 +654,13 @@ function renderUpTo(idx) {
 }
 
 function jumpToPhase(idx) {
+  if (!isPgConnected) return;
   currentStep = idx;
   renderUpTo(currentStep);
 }
 
 function stepForward() {
+  if (!isPgConnected) return;
   if (currentStep < phases.length - 1) {
     currentStep++;
   } else {
@@ -566,6 +670,7 @@ function stepForward() {
 }
 
 function startPlay() {
+  if (!isPgConnected) return;
   if (currentStep >= phases.length - 1) {
     currentStep = 0;
     renderUpTo(0);
@@ -593,15 +698,19 @@ function pausePlay() {
   const btn = document.getElementById('btn-play');
   btn.innerHTML = '&#9654; Play Workflow';
   btn.classList.remove('paused');
-  document.getElementById('status-pill').innerHTML = '&#10074;&#10074; PAUSED AT PHASE ' + (currentStep + 1);
+  if (isPgConnected) {
+    document.getElementById('status-pill').innerHTML = '&#10074;&#10074; PAUSED AT PHASE ' + (currentStep + 1);
+  }
 }
 
 function togglePlay() {
+  if (!isPgConnected) return;
   if (isPlaying) pausePlay();
   else startPlay();
 }
 
 function resetWorkflow() {
+  if (!isPgConnected) return;
   pausePlay();
   currentStep = 0;
   renderUpTo(0);
@@ -616,7 +725,6 @@ function updateSpeed() {
   }
 }
 
-// Start with Phase 1 visible on load
 renderUpTo(0);
 </script>
 </body>
