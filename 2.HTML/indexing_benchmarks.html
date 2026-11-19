@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CS G516 — Spatiotemporal Indexing & Live Workflow Benchmarks</title>
+<title>Spatiotemporal Indexing & Live Execution Benchmarks</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   * { box-sizing: border-box; }
@@ -29,9 +29,9 @@
   .topbar-right { display: flex; align-items: center; gap: 10px; }
 
   .badge-live {
-    background: rgba(34, 197, 94, 0.12);
-    border: 1px solid rgba(34, 197, 94, 0.4);
-    color: #4ade80;
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.5);
+    color: #fb7185;
     font-family: Consolas, monospace;
     font-size: 0.76rem;
     padding: 6px 12px;
@@ -68,6 +68,7 @@
     border-color: #f43f5e;
     color: #fb7185;
   }
+  .pg-toggle.disconnected:hover { background: rgba(244, 63, 94, 0.25); }
   .pg-toggle.disconnected .dot {
     background: #f43f5e;
     box-shadow: 0 0 8px #f43f5e;
@@ -87,20 +88,6 @@
     pointer-events: none;
     filter: grayscale(60%);
   }
-  .offline-banner {
-    display: none;
-    background: rgba(244, 63, 94, 0.14);
-    border: 1px solid rgba(244, 63, 94, 0.5);
-    color: #fda4af;
-    font-family: Consolas, monospace;
-    font-size: 0.82rem;
-    padding: 10px 16px;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .offline-banner.visible { display: block; }
 
   .left-col { display: flex; flex-direction: column; gap: 16px; }
 
@@ -294,23 +281,19 @@
 
   <div class="topbar">
     <div>
-      <h1>CS G516: Spatiotemporal Indexing &amp; Live Execution Benchmarks</h1>
+      <h1>Spatiotemporal Indexing &amp; Live Execution Benchmarks</h1>
       <p>PostgreSQL 15 + PostGIS 3.3 &bull; 50,000 Sequential Telemetry Pings (<code>14_benchmark_suite.sql</code>)</p>
     </div>
     <div class="topbar-right">
-      <div class="badge-live" id="status-pill">&#9679; READY &mdash; CLICK PLAY OR STEP</div>
-      <button id="pg-conn-btn" class="pg-toggle" onclick="togglePgConnection()" title="Toggle PostgreSQL Engine Connection">
+      <div class="badge-live" id="status-pill">&#9679; ENGINE OFFLINE</div>
+      <button id="pg-conn-btn" class="pg-toggle disconnected" onclick="togglePgConnection()">
         <span class="dot"></span>
-        <span id="pg-conn-lbl">PostgreSQL Connected</span>
+        <span id="pg-conn-lbl">PostgreSQL Disconnected</span>
       </button>
     </div>
   </div>
 
-  <div id="offline-banner" class="offline-banner">
-    &#9888; ENGINE DISCONNECTED &mdash; Click "PostgreSQL Disconnected" in the top-right corner to reconnect and resume live workflow execution.
-  </div>
-
-  <div class="workspace" id="workspace-main">
+  <div class="workspace offline-locked" id="workspace-main">
     <!-- LEFT COLUMN: Top Static Benchmarks + Bottom Live Line Graph -->
     <div class="left-col">
       <div class="kpis">
@@ -411,22 +394,20 @@
   </div>
 
 <script>
-// --- 0. Dummy PostgreSQL Connection Toggle ---
-let isPgConnected = true;
+// --- 0. PostgreSQL Connection Toggle (Starts Disconnected) ---
+let isPgConnected = false;
 
 function togglePgConnection() {
   isPgConnected = !isPgConnected;
   const btn = document.getElementById('pg-conn-btn');
   const lbl = document.getElementById('pg-conn-lbl');
   const workspace = document.getElementById('workspace-main');
-  const banner = document.getElementById('offline-banner');
   const pill = document.getElementById('status-pill');
 
   if (isPgConnected) {
     btn.classList.remove('disconnected');
     lbl.innerText = 'PostgreSQL Connected';
     workspace.classList.remove('offline-locked');
-    banner.classList.remove('visible');
     pill.style.borderColor = 'rgba(34, 197, 94, 0.4)';
     pill.style.color = '#4ade80';
     pill.style.background = 'rgba(34, 197, 94, 0.12)';
@@ -436,7 +417,6 @@ function togglePgConnection() {
     btn.classList.add('disconnected');
     lbl.innerText = 'PostgreSQL Disconnected';
     workspace.classList.add('offline-locked');
-    banner.classList.add('visible');
     pill.style.borderColor = 'rgba(244, 63, 94, 0.5)';
     pill.style.color = '#fb7185';
     pill.style.background = 'rgba(244, 63, 94, 0.15)';
@@ -486,7 +466,7 @@ new Chart(document.getElementById('c3'), {
   }
 });
 
-// --- 2. Bottom Live Workflow Line Chart Data (Realistic Index Micro-Spikes Included) ---
+// --- 2. Bottom Live Workflow Line Chart Data ---
 const phases = [
   {
     short: '1. Customer Gate',
@@ -714,7 +694,7 @@ function resetWorkflow() {
   pausePlay();
   currentStep = 0;
   renderUpTo(0);
-  document.getElementById('status-pill').innerHTML = '&#9679; READY &mdash; CLICK PLAY OR STEP';
+  document.getElementById('status-pill').innerHTML = '&#9679; CONNECTED &mdash; READY';
 }
 
 function updateSpeed() {
