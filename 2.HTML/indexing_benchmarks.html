@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CS G516 — Indexing & Query Optimization Benchmarks</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 32px; }
+  .header { max-width: 1150px; margin: 0 auto 28px; border-bottom: 1px solid #334155; padding-bottom: 16px; }
+  .header h1 { margin: 0 0 6px; font-size: 1.75rem; color: #38bdf8; }
+  .header p { margin: 0; color: #94a3b8; font-size: 0.95rem; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 1150px; margin: 0 auto 28px; }
+  .kpi { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px; }
+  .kpi .val { font-size: 1.9rem; font-weight: 700; color: #22c55e; }
+  .kpi .lbl { color: #94a3b8; font-size: 0.88rem; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1150px; margin: 0 auto; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; color: #e2e8f0; }
+  .card p { margin: 0 0 16px; font-size: 0.85rem; color: #94a3b8; line-height: 1.4; }
+  .canvas-box { position: relative; height: 240px; margin-top: auto; }
+  code { background: #0f172a; color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>CS G516: Spatiotemporal Indexing & Query Optimization Benchmarks</h1>
+    <p>Live empirical metrics measured on PostgreSQL + PostGIS (50,000 sequential telemetry observations in <code>location_trace</code>)</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="val">97.8% Smaller</div><div class="lbl">BRIN vs. B-Tree Timestamp Index (24.0 KB vs 1112.0 KB)</div></div>
+    <div class="kpi"><div class="val">69.7x Faster</div><div class="lbl">GiST KNN Spatial Lookup (0.229 ms vs 15.966 ms Seq Scan)</div></div>
+    <div class="kpi"><div class="val">8.0 KB RAM</div><div class="lbl">Partial Hot-Path Index (Excludes Historical Orders)</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>1. Time-Series Compression (BRIN vs B-Tree)</h3>
+      <p>GPS pings arrive chronologically. <code>BRIN</code> stores only min/max timestamps per 128-page disk block instead of every row.</p>
+      <div class="canvas-box"><canvas id="c1"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>2. Spatial KNN Latency (GiST vs Seq Scan)</h3>
+      <p>Bounding-box operator <code>&lt;-&gt;</code> uses the <code>GiST</code> R-Tree to shortlist the nearest driver before running spherical math.</p>
+      <div class="canvas-box"><canvas id="c2"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>3. Active Hot-Path Isolation (Partial Index)</h3>
+      <p><code>WHERE status IN ('PENDING','PREPARING','READY')</code> keeps historical deliveries out of RAM during live dispatch.</p>
+      <div class="canvas-box"><canvas id="c3"></canvas></div>
+    </div>
+  </div>
+
+<script>
+const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5e1' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } } } };
+
+new Chart(document.getElementById('c1'), {
+  type: 'bar',
+  data: { labels: ['Standard B-Tree', 'BRIN Index'], datasets: [{ data: [1112.0, 24.0], backgroundColor: ['#ef4444', '#22c55e'], borderRadius: 6 }] },
+  options: { ...opt, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw + ' KB' } } } }
+});
+
+new Chart(document.getElementById('c2'), {
+  type: 'bar',
+  data: { labels: ['Seq Scan (No Index)', 'GiST Index (<->)'], datasets: [{ data: [15.966, 0.229], backgroundColor: ['#f59e0b', '#38bdf8'], borderRadius: 6 }] },
+  options: { ...opt, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw + ' ms' } } } }
+});
+
+new Chart(document.getElementById('c3'), {
+  type: 'doughnut',
+  data: { labels: ['Historical Orders (Excluded)', 'Active Hot-Path (Indexed)'], datasets: [{ data: [95, 5], backgroundColor: ['#334155', '#a855f7'], borderWidth: 0 }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
+});
+</script>
+</body>
+</html>

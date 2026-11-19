@@ -1,0 +1,38 @@
+Beyond creating indexes, the SQL queries themselves are written using five specific optimization patterns so PostgreSQL does as little work as possible per request:
+
+* **1. Index-Assisted Bounding Box KNN (`<->`) vs. Heavy Spherical Math (`ST_Distance`):**
+* **Where it is used:** `dispatch_order_atomic` (`07_order_lifecycle.sql`), `Q6.2`, and `12_concurrency_stress_test.sql`.
+
+
+* **How it optimizes the query:** Calculating exact curved-Earth distance (`ST_Distance` on `::geography`) is computationally expensive. Instead of running that trigonometry on every driver in the database, the query orders by the lightweight 2D bounding-box operator `lt.location <-> v_rest_geom`. PostgreSQL pushes `<->` directly into the GiST spatial index to grab the nearest candidate immediately, and only computes exact meter distance on the winning driver.
+
+
+
+
+* **2. Single-Pass Latest Ping Extraction (`DISTINCT ON`):**
+* **Where it is used:** `Q6.1`–`Q6.3`, `dispatch_order_atomic`, and `view_active_fleet_canteen_distance` (`13_database_views.sql`).
+
+
+* **How it optimizes the query:** Finding each driver's most recent GPS ping typically requires a slow self-join or correlated `MAX(recorded_at)` subquery that scans `location_trace` twice. Using PostgreSQL's `SELECT DISTINCT ON (driver_id) ... ORDER BY driver_id, recorded_at DESC` retrieves the latest coordinate for every driver in a single pass.
+
+
+
+
+* **3. Early Predicate Filtering & Join Pushdown:**
+* **Where it is used:** `Q6.2`, `08_analytical_queries.sql` (`A8.2`, `A8.4`), and `dispatch_order_atomic`.
+* **How it optimizes the query:** Conditions like `WHERE o.status = 'DELIVERED'` filter out non-completed orders *before* running timestamp arithmetic (`EXTRACT(EPOCH ...)`). Similarly, placing `AND o.status = 'IN_TRANSIT'` inside the `LEFT JOIN ... ON` clause filters historical orders during the join itself rather than scanning everything and filtering afterward.
+
+
+* **4. Single-Pass Window Functions (`OVER` instead of Self-Joins):**
+* **Where it is used:** `A8.4` and `A8.5` (`08_analytical_queries.sql`).
+* **How it optimizes the query:** Computing a driver's rolling 3-trip average (`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`) or hourly canteen demand rank (`DENSE_RANK() OVER (...)`) via window frames allows PostgreSQL to sort once and compute trends in a single pass, avoiding expensive self-joins on the `"order"` table.
+
+
+* **5. Lock-Free Contention Skipping (`FOR UPDATE OF d SKIP LOCKED`):**
+* **Where it is used:** `dispatch_order_atomic` and `12_concurrency_stress_test.sql`.
+
+
+* **How it optimizes the query:** Specifying `OF d` locks only the `driver` row (not the joined `location_trace` row), and `SKIP LOCKED` prevents concurrent dispatch workers from sitting idle waiting for locks to release.
+
+
+

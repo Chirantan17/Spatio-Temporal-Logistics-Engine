@@ -1,5 +1,4 @@
 -- ============================================================================
--- CS G516: Advanced Database Systems - Studio Capstone
 -- 02_seed.sql: Ground Truth Dataset for BITS Hyderabad Campus
 -- ============================================================================
 

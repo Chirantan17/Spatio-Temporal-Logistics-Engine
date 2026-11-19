@@ -10,6 +10,7 @@ FROM restaurant r
 JOIN campus_zone cz ON ST_Within(r.location, cz.boundary);
 
 -- Q4.2: Metric Ground Distance from Canteens to Drop-Off Nodes
+--this is show the distance assumptions 
 SELECT r.name AS canteen_name, dl.name AS dropoff_point,
        ROUND(ST_Distance(r.location::geography, dl.point::geography)::numeric, 1) AS distance_meters
 FROM restaurant r
@@ -17,6 +18,8 @@ CROSS JOIN delivery_location dl
 ORDER BY r.name, distance_meters ASC;
 
 -- Q4.3: Drop-Off Gate Containment Audit
+--This query uses PostGIS `ST_Contains` to verify ground truth, proving each drop-off GPS point physically sits inside an authorized campus zone rather than relying blindly on relational IDs.
+-- It catches coordinate errors at the database level so delivery drivers are dispatched strictly to authorized gates instead of restricted areas.
 SELECT cz.zone_name, dl.name AS dropoff_location_name
 FROM delivery_location dl
 JOIN campus_zone cz ON ST_Contains(cz.boundary, dl.point);

@@ -19,7 +19,7 @@ JOIN restaurant r ON o.restaurant_id = r.restaurant_id
 WHERE o.status = 'DELIVERED'
 GROUP BY r.name;
 
--- Q5.3: Driver Telemetry Heartbeat Recency
+-- Q5.3: Driver Telemetry Telemetry Recency
 SELECT driver_id, COUNT(trace_id) AS total_pings, MAX(recorded_at) AS latest_ping_time
 FROM location_trace
 GROUP BY driver_id;

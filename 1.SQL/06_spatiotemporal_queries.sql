@@ -1,5 +1,4 @@
 -- ============================================================================
--- CS G516: Advanced Database Systems
 -- 06_spatiotemporal_queries.sql: Combined Spatiotemporal Fleet Routing
 -- ============================================================================
 
