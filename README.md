@@ -13,7 +13,7 @@
 
 ---
 
-## 📌 Executive Summary
+## 📌 Summary
 
 This repository implements an end-to-end **Spatio-Temporal Database Engine** built on **PostgreSQL 15** and **PostGIS 3.3** for last-mile campus food delivery operations at BITS Pilani, Hyderabad Campus. 
 
