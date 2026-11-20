@@ -121,7 +121,7 @@ SELECT
     r.name AS pickup_restaurant,
     z.zone_name AS dropoff_zone,
     COUNT(o.order_id) AS batch_size,
-    ARRAY_AGG(o.order_id) AS clubbed_order_ids,
+    ARRAY_AGG(o.order_id ORDER BY o.created_at) AS clubbed_order_ids,
     MIN(o.created_at) AS oldest_pending_order_time,
     CASE
         WHEN COUNT(o.order_id) > 1 THEN 'BATCH_ELIGIBLE'
@@ -130,8 +130,9 @@ SELECT
 FROM "order" o
 JOIN restaurant r ON o.restaurant_id = r.restaurant_id
 JOIN delivery_location dl ON o.destination_id = dl.location_id
-JOIN campus_zone z ON ST_Contains(z.boundary, dl.point) AND z.zone_type <> 'RESTRICTED_INTERIOR'
+JOIN campus_zone z ON ST_Contains(z.boundary::geometry, dl.point::geometry)
 WHERE o.status IN ('PENDING', 'PREPARING', 'READY', 'IN_TRANSIT', 'DELIVERED')
+  AND z.zone_type <> 'RESTRICTED_INTERIOR'
 GROUP BY r.name, z.zone_name
 ORDER BY batch_size DESC, oldest_pending_order_time ASC;
 

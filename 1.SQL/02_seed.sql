@@ -112,3 +112,29 @@ VALUES
     ('ORD-20', 1, 5, 9, 1, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '1 day'  + TIME '23:10:00', NOW() - INTERVAL '1 day'  + TIME '23:18:00', NOW() - INTERVAL '1 day'  + TIME '23:19:00', NOW() - INTERVAL '1 day'  + TIME '23:27:00'),
     ('ORD-21', 2, 5, 10, 1, 'PREPARING', 15.00, 50.00, NOW() - INTERVAL '8 minutes',                NULL,                                        NULL,                                        NULL)
 ON CONFLICT (order_id) DO NOTHING;
+
+-- ============================================================================
+-- Multi-Point Driver GPS Trajectories (Non-Zero Trajectory Distance for A8.1)
+-- ============================================================================
+INSERT INTO location_trace (driver_id, location, recorded_at)
+VALUES
+    -- Driver 1 (Ramesh): Main Canteen -> Academic Corridor -> Hostel Zone A (~1.65 km)
+    (1, ST_SetSRID(ST_MakePoint(78.5416, 17.5214), 4326), NOW() - INTERVAL '25 minutes'),
+    (1, ST_SetSRID(ST_MakePoint(78.5442, 17.5238), 4326), NOW() - INTERVAL '18 minutes'),
+    (1, ST_SetSRID(ST_MakePoint(78.5475, 17.5269), 4326), NOW() - INTERVAL '11 minutes'),
+    (1, ST_SetSRID(ST_MakePoint(78.5502, 17.5295), 4326), NOW() - INTERVAL '4 minutes'),
+
+    -- Driver 2 (Suresh): Main Canteen -> Library -> Hostel Zone A (~1.25 km)
+    (2, ST_SetSRID(ST_MakePoint(78.5418, 17.5216), 4326), NOW() - INTERVAL '22 minutes'),
+    (2, ST_SetSRID(ST_MakePoint(78.5448, 17.5245), 4326), NOW() - INTERVAL '14 minutes'),
+    (2, ST_SetSRID(ST_MakePoint(78.5481, 17.5276), 4326), NOW() - INTERVAL '6 minutes'),
+
+    -- Driver 3 (Anita): SAC Canteen -> Sports Complex -> Academic Gate (~1.40 km)
+    (3, ST_SetSRID(ST_MakePoint(78.5390, 17.5190), 4326), NOW() - INTERVAL '20 minutes'),
+    (3, ST_SetSRID(ST_MakePoint(78.5425, 17.5220), 4326), NOW() - INTERVAL '12 minutes'),
+    (3, ST_SetSRID(ST_MakePoint(78.5460, 17.5252), 4326), NOW() - INTERVAL '5 minutes'),
+
+    -- Driver 5 (Pooja): Yummpys -> Academic Corridor (~1.10 km)
+    (5, ST_SetSRID(ST_MakePoint(78.5405, 17.5205), 4326), NOW() - INTERVAL '19 minutes'),
+    (5, ST_SetSRID(ST_MakePoint(78.5435, 17.5232), 4326), NOW() - INTERVAL '10 minutes'),
+    (5, ST_SetSRID(ST_MakePoint(78.5468, 17.5260), 4326), NOW() - INTERVAL '3 minutes');
