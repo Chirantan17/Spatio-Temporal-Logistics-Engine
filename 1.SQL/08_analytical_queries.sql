@@ -107,7 +107,7 @@ SELECT
     z.zone_name,
     COUNT(o.order_id) AS total_zone_orders
 FROM campus_zone z
-LEFT JOIN delivery_location dl ON ST_Covers(z.boundary, dl.point)
+LEFT JOIN delivery_location dl ON ST_Contains(z.boundary, dl.point)
 LEFT JOIN "order" o ON dl.location_id = o.destination_id
 GROUP BY z.zone_name
 ORDER BY total_zone_orders DESC, z.zone_name;
@@ -130,7 +130,7 @@ SELECT
 FROM "order" o
 JOIN restaurant r ON o.restaurant_id = r.restaurant_id
 JOIN delivery_location dl ON o.destination_id = dl.location_id
-JOIN campus_zone z ON ST_Covers(z.boundary, dl.point) AND z.zone_type <> 'RESTRICTED_INTERIOR'
+JOIN campus_zone z ON ST_Contains(z.boundary, dl.point) AND z.zone_type <> 'RESTRICTED_INTERIOR'
 WHERE o.status IN ('PENDING', 'PREPARING', 'READY', 'IN_TRANSIT', 'DELIVERED')
 GROUP BY r.name, z.zone_name
 ORDER BY batch_size DESC, oldest_pending_order_time ASC;
@@ -154,7 +154,7 @@ SELECT
     ) AS monthly_demand_rank
 FROM active_months am
 CROSS JOIN campus_zone z
-LEFT JOIN delivery_location dl ON ST_Covers(z.boundary, dl.point)
+LEFT JOIN delivery_location dl ON ST_Contains(z.boundary, dl.point)
 LEFT JOIN "order" o
     ON o.destination_id = dl.location_id
    AND EXTRACT(MONTH FROM o.created_at)::int = am.order_month
