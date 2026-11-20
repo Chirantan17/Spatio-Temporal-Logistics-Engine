@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -83,7 +83,7 @@
                                 <span class="bg-slate-800 text-slate-200 text-xs font-mono px-2 py-0.5 rounded font-bold border border-slate-700" id="offer-priority-tag">Priority #1</span>
                                 <span id="offer-type-tag" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono px-2 py-0.5 rounded font-bold">LOCAL STAGED DRIVER</span>
                             </div>
-                            <span id="offer-bonus-badge" class="hidden bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] font-extrabold px-2 py-1 rounded animate-pulse">+&#8377;50.00 OUTLET INCENTIVE</span>
+                            <span id="offer-bonus-badge" class="hidden bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] font-extrabold px-2 py-1 rounded animate-pulse">+₹50.00 OUTLET INCENTIVE</span>
                         </div>
 
                         <div class="flex justify-between items-center mb-2">
@@ -99,7 +99,7 @@
                         <div class="space-y-1.5 my-3 text-xs">
                             <p class="text-slate-300"><i class="fa-solid fa-arrow-right text-orange-400 mr-2"></i> Pickup: <span class="text-white font-bold" id="offer-pickup">Outlet</span></p>
                             <p class="text-slate-300"><i class="fa-solid fa-arrow-right text-sky-400 mr-2"></i> Authorized Drop: <span class="text-sky-400 font-bold" id="offer-dropoff">Gate</span></p>
-                            <p class="text-slate-400 font-mono text-[11px] mt-1" id="offer-payout-text">Delivery Comp: &#8377;15.00</p>
+                            <p class="text-slate-400 font-mono text-[11px] mt-1" id="offer-payout-text">Delivery Comp: ₹15.00</p>
                         </div>
 
                         <div id="offer-warning-msg" class="hidden mt-4 p-3 rounded-lg text-xs font-medium"></div>
@@ -138,8 +138,8 @@
                     </div>
 
                     <div class="grid grid-cols-4 gap-2 text-center border-t border-slate-800 pt-3">
-                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Base Pay</p><p class="text-sm font-mono font-bold text-emerald-400" id="stat-base-pay">&#8377;0</p></div>
-                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Bonuses</p><p class="text-sm font-mono font-bold text-yellow-400" id="stat-bonuses">&#8377;0</p></div>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Base Pay</p><p class="text-sm font-mono font-bold text-emerald-400" id="stat-base-pay">₹0</p></div>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Bonuses</p><p class="text-sm font-mono font-bold text-yellow-400" id="stat-bonuses">₹0</p></div>
                         <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Completed Drops</p><p class="text-sm font-mono font-bold text-slate-200" id="stat-trips">0</p></div>
                         <div class="bg-slate-900 p-2 rounded-lg border border-slate-800"><p class="text-[9px] text-slate-500 uppercase font-bold">Bag Status</p><p class="text-xs font-mono font-bold text-emerald-400 mt-0.5" id="stat-bag-state">SPACE AVAILABLE</p></div>
                     </div>
@@ -166,8 +166,8 @@
                 <span class="text-xs font-mono bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded border border-indigo-500/30">10 Total Fleet Units Stationed</span>
             </div>
             <div class="grid grid-cols-4 gap-4">
-                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Total Shift Earnings</p><p class="text-2xl font-mono font-bold text-emerald-400 mt-1" id="dash-total-earnings">&#8377;0.00</p><p class="text-[10px] text-slate-500 mt-1">&#8377;15 standard per completed drop</p></div>
-                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Outlet Escalation Bonuses</p><p class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="dash-bonuses">&#8377;0.00</p><p class="text-[10px] text-slate-500 mt-1">+&#8377;50 kitchen bonus for last-driver pickup</p></div>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Total Shift Earnings</p><p class="text-2xl font-mono font-bold text-emerald-400 mt-1" id="dash-total-earnings">₹0.00</p><p class="text-[10px] text-slate-500 mt-1">₹15 standard per completed drop</p></div>
+                <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Outlet Escalation Bonuses</p><p class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="dash-bonuses">₹0.00</p><p class="text-[10px] text-slate-500 mt-1">+₹50 kitchen bonus for last-driver pickup</p></div>
                 <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Trajectory Distance</p><p class="text-2xl font-mono font-bold text-sky-400 mt-1" id="dash-distance">0.0 <span class="text-xs text-slate-400">km</span></p><p class="text-[10px] text-slate-500 mt-1">Tracked via location_trace GPS pings</p></div>
                 <div class="bg-cardbg border border-bordercolor rounded-xl p-5 shadow-lg"><p class="text-xs font-bold text-slate-400 uppercase">Current Bag Stowed</p><p class="text-2xl font-mono font-bold text-indigo-400 mt-1" id="dash-bag-stat">0 / 5</p><p class="text-[10px] text-slate-500 mt-1" id="dash-bag-sub">5 items maximum bag capacity</p></div>
             </div>
@@ -364,8 +364,8 @@
             document.getElementById('card-driver-name').innerText = d.name;
             document.getElementById('card-driver-id').innerText = `ID: ${d.id} | Coords: (${d.loc.y.toFixed(4)}, ${d.loc.x.toFixed(4)})`;
             document.getElementById('hub-badge').innerText = `Staged: ${d.hub}`;
-            document.getElementById('stat-base-pay').innerText = `&#8377;${d.basePay}`;
-            document.getElementById('stat-bonuses').innerText = `&#8377;${d.bonuses}`;
+            document.getElementById('stat-base-pay').innerText = `₹${d.basePay}`;
+            document.getElementById('stat-bonuses').innerText = `₹${d.bonuses}`;
             document.getElementById('stat-trips').innerText = d.trips;
 
             const btnOnline = document.getElementById('btn-status-online');
@@ -400,8 +400,8 @@
             }
 
             document.getElementById('analytics-active-driver-lbl').innerText = `${d.name} (${d.hub} Staged)`;
-            document.getElementById('dash-total-earnings').innerText = `&#8377;${(d.basePay + d.bonuses).toFixed(2)}`;
-            document.getElementById('dash-bonuses').innerText = `&#8377;${d.bonuses.toFixed(2)}`;
+            document.getElementById('dash-total-earnings').innerText = `₹${(d.basePay + d.bonuses).toFixed(2)}`;
+            document.getElementById('dash-bonuses').innerText = `₹${d.bonuses.toFixed(2)}`;
             document.getElementById('dash-distance').innerHTML = `${d.distanceKm.toFixed(1)} <span class="text-xs text-slate-400">km</span>`;
             document.getElementById('dash-bag-stat').innerText = `${bagLoad} / ${MAX_BAG_CAPACITY}`;
             document.getElementById('dash-bag-sub').innerText = isBagFull ? 'Bag volume fully stowed' : `${MAX_BAG_CAPACITY - bagLoad} item slots available`;
@@ -427,8 +427,8 @@
                             <h4 class="font-bold text-white text-sm mt-1">${trip.id}</h4>
                         </div>
                         <div class="text-right">
-                            <span class="font-mono text-emerald-400 font-bold text-sm block">&#8377;${trip.payout}.00</span>
-                            ${trip.surgeBonus > 0 ? '<span class="text-[9px] text-yellow-400 font-bold">+&#8377;50 Bonus</span>' : ''}
+                            <span class="font-mono text-emerald-400 font-bold text-sm block">₹${trip.payout}.00</span>
+                            ${trip.surgeBonus > 0 ? '<span class="text-[9px] text-yellow-400 font-bold">+₹50 Bonus</span>' : ''}
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
@@ -643,11 +643,11 @@
             if (isLastDriver) {
                 activeCard.className = 'bg-cardbg border-2 border-yellow-500 rounded-xl p-5 shadow-[0_0_20px_rgba(234,179,8,0.2)] transition-all';
                 document.getElementById('offer-bonus-badge').classList.remove('hidden');
-                document.getElementById('offer-payout-text').innerHTML = 'Delivery Comp: &#8377;15.00 <strong class="text-yellow-400 block mt-0.5">+ &#8377;50.00 Restaurant Bonus = &#8377;65.00 Total</strong>';
+                document.getElementById('offer-payout-text').innerHTML = 'Delivery Comp: ₹15.00 <strong class="text-yellow-400 block mt-0.5">+ ₹50.00 Restaurant Bonus = ₹65.00 Total</strong>';
             } else {
                 activeCard.className = 'bg-cardbg border border-indigo-500/50 rounded-xl p-5 shadow-lg transition-all';
                 document.getElementById('offer-bonus-badge').classList.add('hidden');
-                document.getElementById('offer-payout-text').innerText = 'Delivery Comp: &#8377;15.00 Standard Delivery Fee';
+                document.getElementById('offer-payout-text').innerText = 'Delivery Comp: ₹15.00 Standard Delivery Fee';
             }
 
             document.getElementById('offer-order-id').innerText = currentOrder.id;

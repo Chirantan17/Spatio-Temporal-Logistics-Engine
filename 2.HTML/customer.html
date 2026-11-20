@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -108,11 +108,11 @@
                 <div class="border-t border-slate-800 pt-4 mb-6 text-xs space-y-2">
                     <div class="flex justify-between text-slate-400">
                         <span>Items Subtotal</span>
-                        <span class="font-mono font-bold text-white" id="subtotal">&#8377;0.00</span>
+                        <span class="font-mono font-bold text-white" id="subtotal">₹0.00</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
                         <span>Delivery Fee</span>
-                        <span class="font-mono font-bold text-white" id="delivery-fee-display">&#8377;15.00</span>
+                        <span class="font-mono font-bold text-white" id="delivery-fee-display">₹15.00</span>
                     </div>
                     <div class="flex justify-between text-slate-400">
                         <span>Physical Items (Bag Load)</span>
@@ -124,7 +124,7 @@
                     </div>
                     <div class="flex justify-between text-base pt-3 border-t border-slate-800 font-bold">
                         <span class="text-white">Total Paid</span>
-                        <span class="font-mono text-emerald-400" id="total">&#8377;0.00</span>
+                        <span class="font-mono text-emerald-400" id="total">₹0.00</span>
                     </div>
                 </div>
 
@@ -156,7 +156,7 @@
                         <button onclick="handleCustomerChoice('PICKUP')" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition">
                             <i class="fa-solid fa-person-walking mr-1.5"></i> Available for Self-Pickup
                         </button>
-                        <p class="text-[10px] text-yellow-300 italic text-center">Collect your &#8377;15 delivery fee CASH REFUND at the counter.</p>
+                        <p class="text-[10px] text-yellow-300 italic text-center">Collect your ₹15 delivery fee CASH REFUND at the counter.</p>
 
                         <button onclick="handleCustomerChoice('CANCEL')" class="w-full bg-slate-900 hover:bg-rose-950 border border-slate-700 text-rose-300 font-bold py-2 rounded-lg text-xs transition mt-2">
                             <i class="fa-solid fa-xmark mr-1.5"></i> Not Available for Pickup (Cancel Order)
@@ -294,10 +294,10 @@
 
             if (session.cart.length === 0) {
                 cartItemsEl.innerHTML = '<p class="text-xs text-slate-500 text-center mt-12 italic">Cart is empty</p>';
-                document.getElementById('subtotal').innerText = '&#8377;0.00';
+                document.getElementById('subtotal').innerText = '₹0.00';
                 document.getElementById('total-bag-items').innerText = '0 / 5 units';
                 document.getElementById('total-stove-units').innerText = '0 slots';
-                document.getElementById('total').innerText = '&#8377;0.00';
+                document.getElementById('total').innerText = '₹0.00';
                 checkoutBtn.disabled = true;
                 return;
             }
@@ -314,15 +314,15 @@
                             <span class="text-slate-300 font-medium">${item.qty}x ${item.name}</span>
                             <span class="text-[10px] text-slate-500 font-mono block">${item.stoveUnits * item.qty} line slot(s) | ${item.qty} bag unit(s)</span>
                         </div>
-                        <span class="font-mono text-slate-400">&#8377;${itemTotal.toFixed(2)}</span>
+                        <span class="font-mono text-slate-400">₹${itemTotal.toFixed(2)}</span>
                     </div>
                 `;
             }).join('');
 
-            document.getElementById('subtotal').innerText = `&#8377;${subtotal.toFixed(2)}`;
+            document.getElementById('subtotal').innerText = `₹${subtotal.toFixed(2)}`;
             document.getElementById('total-bag-items').innerText = `${totalBagUnits} / 5 units`;
             document.getElementById('total-stove-units').innerText = `${totalCookingUnits} slots`;
-            document.getElementById('total').innerText = `&#8377;${(subtotal + 15).toFixed(2)}`;
+            document.getElementById('total').innerText = `₹${(subtotal + 15).toFixed(2)}`;
             checkoutBtn.disabled = false;
         }
 
@@ -412,7 +412,7 @@
             if (choice === 'PICKUP') {
                 session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-yellow-900/40 border-yellow-500/60 text-center';
                 session.statusState = 'SELF-PICKUP CONFIRMED';
-                session.statusSubtext = `Please collect your food at ${activeRestaurant}. Collect your &#8377;15 cash refund at counter!`;
+                session.statusSubtext = `Please collect your food at ${activeRestaurant}. Collect your ₹15 cash refund at counter!`;
                 
                 logSql('Order Fallback Update', `UPDATE "order" SET \n  driver_id = NULL,\n  status = 'READY_FOR_PICKUP',\n  delivery_fee = 0.00\nWHERE order_id = '${session.activeOrderId}';`);
                 
@@ -420,7 +420,7 @@
             } else {
                 session.bannerClass = 'mt-4 p-3.5 rounded-xl border bg-rose-900/40 border-rose-500/60 text-center';
                 session.statusState = 'ORDER CANCELLED (NO DRIVERS)';
-                session.statusSubtext = 'Order cancelled. &#8377;15 delivery fee refunded; food retained by kitchen.';
+                session.statusSubtext = 'Order cancelled. ₹15 delivery fee refunded; food retained by kitchen.';
 
                 logSql('Order Cancellation Update', `UPDATE "order" SET status = 'CANCELLED' WHERE order_id = '${session.activeOrderId}';`);
 
@@ -461,7 +461,7 @@
                         <h4 class="font-bold text-xs text-slate-200">${item.name}</h4>
                     </div>
                     <div class="flex items-center space-x-3">
-                        <span class="font-mono text-xs text-emerald-400 font-bold">&#8377;${item.price.toFixed(2)}</span>
+                        <span class="font-mono text-xs text-emerald-400 font-bold">₹${item.price.toFixed(2)}</span>
                         <button onclick="addToCart('${item.name}', ${item.price}, ${item.stoveUnits})" class="bg-slate-800 hover:bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold transition">Add +</button>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -60,7 +60,7 @@
                                 <span class="text-[10px] text-slate-500 font-mono">Max 5 items stowed per driver run</span>
                             </div>
                             <span id="badge-bag-overload" class="bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
-                                <i class="fa-solid fa-check mr-1"></i> PASS (&le;5)
+                                <i class="fa-solid fa-check mr-1"></i> PASS (≤5)
                             </span>
                         </div>
                         <div id="bag-overload-detail" class="hidden mt-2 pt-2 border-t border-amber-900/40 text-[11px] font-mono text-amber-300"></div>
@@ -243,7 +243,7 @@
                 if (activeAnomalies === 0) updateAuditPill(true);
                 row.className = 'bg-slate-900 p-3 rounded-lg border border-slate-800 transition';
                 badge.className = 'bg-emerald-500/10 text-emerald-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold';
-                badge.innerHTML = `<i class="fa-solid fa-check mr-1"></i> PASS (&le;5)`;
+                badge.innerHTML = `<i class="fa-solid fa-check mr-1"></i> PASS (≤5)`;
                 detail.classList.add('hidden');
             }
         }
