@@ -88,3 +88,27 @@ UNION ALL
 SELECT 'order_items', count(*) FROM order_item
 UNION ALL
 SELECT 'location_traces', count(*) FROM location_trace;
+
+-- ============================================================================
+-- Analytical Demonstration Workload Orders (Multi-Canteen, Multi-Hour, Escalation)
+-- ============================================================================
+INSERT INTO "order" (order_id, customer_id, restaurant_id, driver_id, destination_id, status, delivery_fee, surge_bonus, created_at, ready_at, dispatched_at, fulfilled_at)
+VALUES
+    -- Main Canteen -> Hostel Zone A (2 orders at 13:00 lunch peak -> Batch Eligible)
+    ('ORD-12', 1, 1, 1, 1, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '3 days' + TIME '13:05:00', NOW() - INTERVAL '3 days' + TIME '13:14:00', NOW() - INTERVAL '3 days' + TIME '13:15:00', NOW() - INTERVAL '3 days' + TIME '13:26:00'),
+    ('ORD-13', 2, 1, 2, 1, 'DELIVERED', 15.00, 50.00, NOW() - INTERVAL '2 days' + TIME '13:12:00', NOW() - INTERVAL '2 days' + TIME '13:22:00', NOW() - INTERVAL '2 days' + TIME '13:23:00', NOW() - INTERVAL '2 days' + TIME '13:37:00'),
+    ('ORD-14', 3, 1, 1, 2, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '1 day'  + TIME '20:15:00', NOW() - INTERVAL '1 day'  + TIME '20:24:00', NOW() - INTERVAL '1 day'  + TIME '20:25:00', NOW() - INTERVAL '1 day'  + TIME '20:35:00'),
+
+    -- Yummpys -> Academic Corridor (3 orders at 13:00 & 17:00 -> High volume + Escalation Bonus)
+    ('ORD-15', 2, 3, 5, 2, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '3 days' + TIME '13:20:00', NOW() - INTERVAL '3 days' + TIME '13:28:00', NOW() - INTERVAL '3 days' + TIME '13:29:00', NOW() - INTERVAL '3 days' + TIME '13:38:00'),
+    ('ORD-16', 4, 3, 6, 2, 'DELIVERED', 15.00, 50.00, NOW() - INTERVAL '2 days' + TIME '17:30:00', NOW() - INTERVAL '2 days' + TIME '17:39:00', NOW() - INTERVAL '2 days' + TIME '17:40:00', NOW() - INTERVAL '2 days' + TIME '17:52:00'),
+    ('ORD-17', 1, 3, 5, 2, 'READY',     15.00, 0.00,  NOW() - INTERVAL '15 minutes',               NOW() - INTERVAL '5 minutes',                NULL,                                        NULL),
+
+    -- SAC Canteen & Central Library Cafe -> Sports/Academic Zones
+    ('ORD-18', 5, 2, 3, 3, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '2 days' + TIME '17:45:00', NOW() - INTERVAL '2 days' + TIME '17:53:00', NOW() - INTERVAL '2 days' + TIME '17:54:00', NOW() - INTERVAL '2 days' + TIME '18:04:00'),
+    ('ORD-19', 3, 4, 7, 2, 'DELIVERED', 15.00, 50.00, NOW() - INTERVAL '1 day'  + TIME '20:40:00', NOW() - INTERVAL '1 day'  + TIME '20:47:00', NOW() - INTERVAL '1 day'  + TIME '20:48:00', NOW() - INTERVAL '1 day'  + TIME '20:57:00'),
+
+    -- Hostel Circle Late-Night Hub -> Hostel Zone A (2 orders at 23:00 -> Night Peak Batch)
+    ('ORD-20', 1, 5, 9, 1, 'DELIVERED', 15.00, 0.00,  NOW() - INTERVAL '1 day'  + TIME '23:10:00', NOW() - INTERVAL '1 day'  + TIME '23:18:00', NOW() - INTERVAL '1 day'  + TIME '23:19:00', NOW() - INTERVAL '1 day'  + TIME '23:27:00'),
+    ('ORD-21', 2, 5, 10, 1, 'PREPARING', 15.00, 50.00, NOW() - INTERVAL '8 minutes',                NULL,                                        NULL,                                        NULL)
+ON CONFLICT (order_id) DO NOTHING;

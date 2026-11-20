@@ -130,7 +130,7 @@ SELECT
 FROM "order" o
 JOIN restaurant r ON o.restaurant_id = r.restaurant_id
 JOIN delivery_location dl ON o.destination_id = dl.location_id
-JOIN campus_zone z ON ST_Covers(z.boundary, dl.point)
+JOIN campus_zone z ON ST_Covers(z.boundary, dl.point) AND z.zone_type <> 'RESTRICTED_INTERIOR'
 WHERE o.status IN ('PENDING', 'PREPARING', 'READY', 'IN_TRANSIT', 'DELIVERED')
 GROUP BY r.name, z.zone_name
 ORDER BY batch_size DESC, oldest_pending_order_time ASC;
